@@ -1,0 +1,2282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasheesh | Premium Cannabis Experience</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=Archivo:wght@300;400;500;600&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+    <script src="https://unpkg.com/split-type"></script>
+
+    <script async src="https://ga.jspm.io/npm:es-module-shims@1.8.0/dist/es-module-shims.js" crossorigin="anonymous"></script>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <style>
+        /* ============================================
+           VARIABLES & RESET
+           ============================================ */
+        :root {
+            --bg-cream: #F2EFEC;
+            --bg-cream-dark: #EAE6DE;
+            --bg-cream-darker: #DED8CD;
+
+            --text-dark: #111111;
+            --text-muted: #66625C;
+
+            --gold: #C5A059;
+            --gold-bright: #D4AF37;
+            --gold-deep: #8C6D2E;
+            --gold-gradient: linear-gradient(135deg, #D4AF37 0%, #C5A059 50%, #8C6D2E 100%);
+
+            --grid-color: rgba(0,0,0,0.06);
+            --line-color: rgba(31, 29, 26, 0.12);
+
+            --font-display: 'Playfair Display', serif;
+            --font-body: 'Archivo', sans-serif;
+            --font-mono: 'Space Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html.lenis {
+            height: auto;
+        }
+
+        .lenis.lenis-smooth {
+            scroll-behavior: auto;
+        }
+
+        body {
+            background-color: var(--bg-cream);
+            color: var(--text-dark);
+            font-family: var(--font-body);
+            overflow-x: hidden;
+            cursor: none;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body.loading {
+            overflow: hidden;
+        }
+
+        @media (hover: none) {
+            body { cursor: auto; }
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        button, a {
+            cursor: none;
+        }
+
+        /* ============================================
+           PRELOADER
+           ============================================ */
+        .preloader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-cream);
+            z-index: 100000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .preloader__text {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            color: var(--gold);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        /* ============================================
+           GLOBAL EFFECTS
+           ============================================ */
+        .noise-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9000;
+            opacity: 0.04;
+            mix-blend-mode: multiply;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* ============================================
+           CURSOR
+           ============================================ */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            background: var(--gold);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 99999;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            mix-blend-mode: multiply;
+        }
+
+        .cursor.active {
+            transform: translate(-50%, -50%) scale(2);
+            opacity: 0.4;
+            box-shadow: 0 0 0 2px var(--gold);
+        }
+
+        /* ============================================
+           NAVIGATION
+           ============================================ */
+        .nav-top {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 40px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            pointer-events: none;
+            transition: background 0.3s ease, backdrop-filter 0.3s ease;
+        }
+
+        .nav-top.scrolled {
+            background: rgba(242, 241, 234, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 20px 40px;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--text-dark);
+            pointer-events: auto;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            pointer-events: auto;
+        }
+
+        .nav-item {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            position: relative;
+        }
+
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0%;
+            height: 1px;
+            background: var(--gold);
+            transition: width 0.3s ease;
+        }
+
+        .nav-item:hover::after,
+        .nav-item.active::after {
+            width: 100%;
+        }
+
+        /* ============================================
+           HERO SECTION
+           ============================================ */
+        .hero-wrapper {
+            height: 600vh;
+            position: relative;
+        }
+
+        .hero-fixed {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .layout-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 0;
+            padding: 0 40px;
+        }
+
+        .grid-line {
+            width: 1px;
+            height: 100%;
+            background: var(--grid-color);
+        }
+
+        .atmosphere {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            mix-blend-mode: multiply;
+        }
+
+        .orb-1 {
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, #C5A059 0%, transparent 70%);
+            top: 10%;
+            left: -10%;
+            animation: float1 25s ease-in-out infinite;
+        }
+
+        .orb-2 {
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, #D4B068 0%, transparent 70%);
+            bottom: 15%;
+            right: -15%;
+            animation: float2 30s ease-in-out infinite;
+        }
+
+        .orb-3 {
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, #B8974D 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: float3 20s ease-in-out infinite;
+        }
+
+        @keyframes float1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(100px, -50px) scale(1.1); }
+        }
+
+        @keyframes float2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-80px, 60px) scale(1.15); }
+        }
+
+        @keyframes float3 {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-45%, -55%) scale(1.08); }
+        }
+
+        .stage {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1200px;
+            will-change: transform;
+        }
+
+        .big-text {
+            position: absolute;
+            font-family: var(--font-display);
+            font-size: 18vw;
+            line-height: 0.85;
+            font-weight: 700;
+            color: var(--gold);
+            white-space: nowrap;
+            letter-spacing: -0.04em;
+            z-index: 10;
+            mix-blend-mode: multiply;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #BEA35A 0%, var(--gold) 35%, #D1BE7E 50%, var(--gold) 65%, #BEA35A 100%);
+            background-size: 100% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .pen-item {
+            position: absolute;
+            background-image: url("images/champagnegoldpen.png");
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            will-change: transform;
+        }
+
+        .pen-bg-1 {
+            width: 20vw;
+            height: 40vh;
+            top: 8%;
+            left: 5%;
+            z-index: 2;
+            opacity: 0.65;
+            filter: blur(2px);
+            transform: rotate(-25deg);
+        }
+
+        .pen-bg-2 {
+            width: 24vw;
+            height: 48vh;
+            bottom: 5%;
+            right: 8%;
+            z-index: 3;
+            opacity: 0.7;
+            filter: blur(1.5px);
+            transform: rotate(30deg);
+        }
+
+        .pen-bg-3 {
+            width: 18vw;
+            height: 36vh;
+            top: 18%;
+            right: 25%;
+            z-index: 1;
+            opacity: 0.55;
+            filter: blur(2.5px);
+            transform: rotate(75deg);
+        }
+
+        .pen-hero {
+            width: 38vw;
+            height: 76vh;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-12deg);
+            z-index: 15;
+            filter: drop-shadow(0 30px 50px rgba(0,0,0,0.25));
+        }
+
+        .pen-flavor {
+            width: 38vw;
+            height: 76vh;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-12deg);
+            z-index: 14;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.2));
+            opacity: 0;
+        }
+
+        .pen-flavor-1 {
+            background-image: url("images/blackpen.png");
+        }
+
+        .pen-flavor-2 {
+            background-image: url("images/azuregreenpen.png");
+        }
+
+        .pen-flavor-3 {
+            background-image: url("images/sakurapinkpen.png");
+        }
+
+        .pen-flavor-4 {
+            background-image: url("images/silverpen.png");
+        }
+
+        .pen-fg-1 {
+            width: 26vw;
+            height: 52vh;
+            bottom: -8%;
+            left: -5%;
+            z-index: 20;
+            opacity: 0.85;
+            filter: blur(3.5px);
+            transform: rotate(55deg);
+        }
+
+        .pen-fg-2 {
+            width: 22vw;
+            height: 44vh;
+            top: -3%;
+            right: 3%;
+            z-index: 21;
+            opacity: 0.75;
+            filter: blur(3px);
+            transform: rotate(-50deg);
+        }
+
+        .pen-labels {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 18vh;
+            pointer-events: none;
+            z-index: 25;
+            opacity: 0;
+        }
+
+        .label-container {
+            position: relative;
+            width: 100%;
+            height: 80px;
+        }
+
+        .pen-label {
+            position: absolute;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        .label-1 {
+            left: 50%;
+            transform: translateX(-50%) translateY(15px);
+            margin-left: -32vw;
+        }
+
+        .label-2 {
+            left: 50%;
+            transform: translateX(-50%) translateY(15px);
+            margin-left: -16vw;
+        }
+
+        .label-hero {
+            left: 50%;
+            transform: translateX(-50%) translateY(15px);
+        }
+
+        .label-3 {
+            left: 50%;
+            transform: translateX(-50%) translateY(15px);
+            margin-left: 16vw;
+        }
+
+        .label-4 {
+            left: 50%;
+            transform: translateX(-50%) translateY(15px);
+            margin-left: 32vw;
+        }
+
+        .label-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-dark);
+        }
+
+        .label-line {
+            width: 1px;
+            height: 15px;
+            background: var(--text-dark);
+            opacity: 0.25;
+        }
+
+        .hero-scroll-indicator {
+            position: absolute;
+            bottom: 10vh;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            z-index: 30;
+            pointer-events: auto;
+        }
+
+        .hero-scroll-indicator span {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 500;
+            color: var(--text-dark);
+        }
+
+        .indicator-line {
+            width: 1px;
+            height: 40px;
+            background: var(--text-dark);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .indicator-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gold);
+            animation: scrollLoop 2s cubic-bezier(0.77, 0, 0.175, 1) infinite;
+        }
+
+        @keyframes scrollLoop {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        /* ============================================
+           COLLECTION SECTION
+           ============================================ */
+        .collection {
+            min-height: 100vh;
+            background: var(--bg-cream);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 4vw;
+            position: relative;
+            z-index: 10;
+        }
+
+        .collection-wrapper {
+            width: 100%;
+            max-width: 1600px;
+            height: 700vh; /* Increased height for scroll space */
+            max-height: none;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: clamp(40px, 5vw, 100px);
+            align-items: start;
+            position: relative;
+        }
+
+        .collection-sidebar {
+            height: calc(100vh - 60px);
+            position: sticky;
+            top: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border-right: 1px solid var(--line-color);
+            padding-right: clamp(20px, 3vw, 40px);
+        }
+
+        .sidebar-header {
+            margin-bottom: 2rem;
+        }
+
+        .eyebrow {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .collection-nav-item {
+            cursor: none;
+            position: relative;
+            opacity: 0.5;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .collection-nav-item:hover {
+            opacity: 0.8;
+            transform: translateX(5px);
+        }
+
+        .collection-nav-item.active {
+            opacity: 1;
+            transform: translateX(10px);
+        }
+
+        .collection-nav-link {
+            display: block;
+            text-decoration: none;
+            outline: none;
+        }
+
+        .nav-name {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            line-height: 1.2;
+            color: var(--text-dark);
+            display: block;
+            margin-bottom: 0.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .nav-meta {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .collection-nav-item.active .nav-name {
+            background: var(--gold-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .coming-soon {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--line-color);
+        }
+
+        .coming-soon-text {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--gold);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            opacity: 0.8;
+        }
+
+        .dossier-stage {
+            height: calc(100vh - 60px);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1500px;
+            position: sticky;
+            top: 60px;
+        }
+
+        .dossier-card {
+            width: 100%;
+            max-width: 1100px;
+            height: auto;
+            min-height: 600px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(30px) saturate(120%);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            display: grid;
+            grid-template-columns: 40% 60%;
+            box-shadow: 0 30px 60px -15px rgba(31, 29, 26, 0.1), inset 0 0 0 1px rgba(255,255,255,0.5);
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.33, 1, 0.68, 1);
+        }
+
+        .dossier-visual {
+            position: relative;
+            background: linear-gradient(180deg, rgba(184,145,70,0.03) 0%, rgba(31,29,26,0.02) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid rgba(31, 29, 26, 0.06);
+            padding: 40px;
+        }
+
+        .product-img {
+            width: 100%;
+            max-width: 220px;
+            height: auto;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.2));
+            transform: rotate(-8deg);
+            opacity: 1;
+            transition: opacity 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .dossier-content {
+            padding: clamp(30px, 4vh, 50px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .content-header {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 1.5rem;
+        }
+
+        .tag-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-tag {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            padding: 4px 8px;
+            border: 1px solid var(--gold);
+            color: var(--gold-deep);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            border-radius: 4px;
+        }
+
+        .product-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 3.5vw, 3.5rem);
+            color: var(--text-dark);
+            font-weight: 400;
+            line-height: 1.1;
+            margin-top: 0.5rem;
+        }
+
+        .product-desc {
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            max-width: 500px;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem 3rem;
+        }
+
+        .spec-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .spec-label {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            opacity: 0.7;
+        }
+
+        .spec-value {
+            font-family: var(--font-body);
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .intensity-track {
+            width: 100%;
+            height: 4px;
+            background: rgba(31, 29, 26, 0.1);
+            margin-top: 5px;
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .intensity-fill {
+            height: 100%;
+            background: var(--gold-gradient);
+            width: 0%;
+            transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .dossier-content > * {
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dossier-card.changing .product-img {
+            opacity: 0;
+            transform: rotate(5deg) scale(0.9) translateX(-20px);
+            filter: blur(20px);
+            transition: all 0.4s ease-in;
+        }
+
+        .dossier-card.changing .dossier-content > * {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease-in;
+        }
+
+        .dossier-card.changing .intensity-fill {
+            width: 0% !important;
+            transition: none;
+        }
+
+        /* ============================================
+           GUMMIES SECTION
+           ============================================ */
+        .gummies {
+            position: relative;
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--bg-cream-dark) 0%, var(--bg-cream) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #gummies-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .gummies__content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: clamp(40px, 6vw, 80px);
+            max-width: 650px;
+            background: rgba(242, 239, 236, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 20px 40px rgba(31, 29, 26, 0.05);
+        }
+
+        .gummies__badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background: var(--gold);
+            color: #fff;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            border-radius: 50px;
+            margin-bottom: 24px;
+        }
+
+        .gummies__headline {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .gummies__headline em {
+            font-style: italic;
+            color: var(--gold);
+        }
+
+        .gummies__body {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            font-weight: 500;
+            text-shadow: 0 1px 5px rgba(255,255,255,0.5);
+        }
+
+        .gummies__cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 36px;
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .gummies__cta:hover {
+            background: var(--gold);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px rgba(184, 145, 70, 0.4);
+        }
+
+        .kinetic-text {
+            font-kerning: none;
+        }
+
+        .kinetic-text .char {
+            display: inline-block;
+            transform-origin: center bottom;
+            backface-visibility: hidden;
+            will-change: transform;
+        }
+
+        /* ============================================
+           FAQ SECTION
+           ============================================ */
+        .faq {
+            background: var(--bg-cream-dark);
+            padding: clamp(60px, 10vh, 120px) 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .faq__inner {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 clamp(20px, 5vw, 80px);
+        }
+
+        .faq__header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .faq__eyebrow {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .faq__title {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 400;
+            line-height: 1.2;
+        }
+
+        .faq__title em {
+            font-style: italic;
+            color: var(--gold);
+        }
+
+        .faq__list {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            background: rgba(0,0,0,0.08);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .faq__item {
+            background: var(--bg-cream);
+        }
+
+        .faq__question {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 28px;
+            text-align: left;
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: background 0.3s ease;
+            background: none;
+            border: none;
+            font-family: var(--font-body);
+        }
+
+        .faq__question:hover {
+            background: rgba(184, 145, 70, 0.03);
+        }
+
+        .faq__icon {
+            flex-shrink: 0;
+            color: var(--gold);
+            transition: transform 0.3s ease;
+        }
+
+        .faq__item.active .faq__icon {
+            transform: rotate(45deg);
+        }
+
+        .faq__answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .faq__item.active .faq__answer {
+            max-height: 300px;
+        }
+
+        .faq__answer p {
+            padding: 0 28px 24px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            line-height: 1.7;
+            color: var(--text-muted);
+        }
+
+        .faq__contact {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .faq__contact p {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .faq__contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--gold);
+            transition: gap 0.3s ease;
+        }
+
+        .faq__contact-link:hover {
+            gap: 12px;
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        .footer {
+            position: relative;
+            background: var(--bg-cream-darker);
+            color: var(--text-dark);
+            padding: 120px clamp(20px, 5vw, 80px) 60px;
+            overflow: hidden;
+        }
+
+        .footer__bg-text {
+            position: absolute;
+            bottom: -5%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--font-display);
+            font-size: 20vw;
+            font-weight: 600;
+            color: rgba(0,0,0,0.03);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .footer__inner {
+            position: relative;
+            z-index: 2;
+        }
+
+        .footer__grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.1);
+            margin-bottom: 60px;
+        }
+
+        .footer__col {
+            padding: 40px;
+            background: var(--bg-cream-darker);
+        }
+
+        .footer__col h4 {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            text-transform: uppercase;
+        }
+
+        .footer__col--brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .footer__logo {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .footer__col--nav a,
+        .footer__col--legal a {
+            display: block;
+            color: var(--text-dark);
+            margin-bottom: 12px;
+            transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .footer__col--nav a:hover,
+        .footer__col--legal a:hover {
+            color: var(--gold);
+        }
+
+        .footer__link-arrow::after {
+            content: ' ->';
+            opacity: 0;
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .footer__link-arrow:hover::after {
+            opacity: 1;
+        }
+
+        .footer__fda-text {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            line-height: 1.5;
+            color: var(--text-muted);
+            text-align: justify;
+        }
+
+        .footer__bottom {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        /* ============================================
+           RESPONSIVE
+           ============================================ */
+        @media (max-width: 1200px) {
+            .collection-wrapper {
+                grid-template-columns: 250px 1fr;
+            }
+        }
+
+        @media (max-width: 950px) {
+            .nav-links {
+                gap: 20px;
+            }
+
+            .nav-item {
+                font-size: 0.7rem;
+            }
+
+            .collection {
+                padding: 60px 20px;
+            }
+
+            .collection-wrapper {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto;
+                height: auto;
+                max-height: none;
+                gap: 50px;
+            }
+
+            .collection-sidebar {
+                border-right: none;
+                padding-right: 0;
+                border-bottom: 1px solid var(--line-color);
+                padding-bottom: 2rem;
+            }
+
+            .nav-list {
+                flex-direction: row;
+                overflow-x: auto;
+                gap: 2rem;
+                padding-bottom: 10px;
+            }
+
+            .nav-name {
+                font-size: 1.2rem;
+                white-space: nowrap;
+            }
+
+            .dossier-card {
+                grid-template-columns: 1fr;
+                grid-template-rows: 350px auto;
+            }
+
+            .dossier-visual {
+                border-right: none;
+                border-bottom: 1px solid rgba(31,29,26,0.06);
+            }
+
+            .product-img {
+                max-width: 160px;
+            }
+
+            .footer__grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .nav-top {
+                padding: 20px;
+            }
+
+            .logo {
+                font-size: 1rem;
+            }
+
+            .nav-links {
+                gap: 15px;
+            }
+
+            .nav-item {
+                font-size: 0.65rem;
+            }
+
+            .big-text {
+                font-size: 25vw;
+            }
+
+            .footer__grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer__bottom {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body class="loading">
+
+<div class="preloader" id="preloader">
+    <div class="preloader__text">Hasheesh</div>
+</div>
+
+<div class="noise-overlay"></div>
+
+<div class="cursor"></div>
+
+<nav class="nav-top" id="mainNav">
+    <div class="logo hover-trigger">HASHEESH.</div>
+    <div class="nav-links">
+        <a href="#hero" class="nav-item hover-trigger active" data-section="hero">Home</a>
+        <a href="#collection" class="nav-item hover-trigger" data-section="collection">Collection</a>
+        <a href="#gummies" class="nav-item hover-trigger" data-section="gummies">Gummies</a>
+        <a href="#faq" class="nav-item hover-trigger" data-section="faq">FAQ</a>
+    </div>
+</nav>
+
+<!-- HERO SECTION -->
+<section class="hero-wrapper" id="hero">
+    <div class="hero-fixed">
+        <div class="layout-grid">
+            <div class="grid-line"></div>
+            <div class="grid-line"></div>
+            <div class="grid-line"></div>
+            <div class="grid-line"></div>
+        </div>
+
+        <div class="atmosphere">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+        </div>
+
+        <div class="stage">
+            <div class="pen-item pen-bg-1 bg-layer"></div>
+            <div class="pen-item pen-bg-2 bg-layer"></div>
+            <div class="pen-item pen-bg-3 bg-layer"></div>
+
+            <h1 class="big-text">HASHEESH</h1>
+
+            <div class="pen-item pen-hero"></div>
+
+            <div class="pen-item pen-flavor pen-flavor-1"></div>
+            <div class="pen-item pen-flavor pen-flavor-2"></div>
+            <div class="pen-item pen-flavor pen-flavor-3"></div>
+            <div class="pen-item pen-flavor pen-flavor-4"></div>
+
+            <div class="pen-item pen-fg-1 fg-layer"></div>
+            <div class="pen-item pen-fg-2 fg-layer"></div>
+        </div>
+
+        <div class="pen-labels">
+            <div class="label-container">
+                <div class="pen-label label-1">
+                    <div class="label-line"></div>
+                    <div class="label-name">Obsidian</div>
+                </div>
+                <div class="pen-label label-2">
+                    <div class="label-line"></div>
+                    <div class="label-name">Azure</div>
+                </div>
+                <div class="pen-label label-hero">
+                    <div class="label-line"></div>
+                    <div class="label-name">Champagne</div>
+                </div>
+                <div class="pen-label label-3">
+                    <div class="label-line"></div>
+                    <div class="label-name">Sakura</div>
+                </div>
+                <div class="pen-label label-4">
+                    <div class="label-line"></div>
+                    <div class="label-name">Silver</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Removed hero-scroll-indicator -->
+    </div>
+</section>
+
+<!-- COLLECTION SECTION -->
+<section class="collection" id="collection">
+    <div class="collection-wrapper">
+        <aside class="collection-sidebar">
+            <div class="sidebar-header">
+                <span class="eyebrow">Technical Specs</span>
+            </div>
+            <ul class="nav-list">
+                <li class="collection-nav-item active hover-trigger" data-id="azure">
+                    <a href="#" class="collection-nav-link">
+                        <span class="nav-name">Azure</span>
+                        <span class="nav-meta">Series 01</span>
+                    </a>
+                </li>
+                <li class="collection-nav-item hover-trigger" data-id="champagne">
+                    <a href="#" class="collection-nav-link">
+                        <span class="nav-name">Champagne</span>
+                        <span class="nav-meta">Gold Ed.</span>
+                    </a>
+                </li>
+                <li class="collection-nav-item hover-trigger" data-id="sakura">
+                    <a href="#" class="collection-nav-link">
+                        <span class="nav-name">Sakura</span>
+                        <span class="nav-meta">Spring</span>
+                    </a>
+                </li>
+                <li class="collection-nav-item hover-trigger" data-id="silver">
+                    <a href="#" class="collection-nav-link">
+                        <span class="nav-name">Silver</span>
+                        <span class="nav-meta">Pure Series</span>
+                    </a>
+                </li>
+                <li class="collection-nav-item hover-trigger" data-id="obsidian">
+                    <a href="#" class="collection-nav-link">
+                        <span class="nav-name">Obsidian</span>
+                        <span class="nav-meta">Night</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="coming-soon">
+                <span class="coming-soon-text">More flavors coming soon</span>
+            </div>
+        </aside>
+
+        <section class="dossier-stage">
+            <div class="dossier-card" id="card">
+                <div class="dossier-visual">
+                    <img src="images/champagnegoldpen.png" alt="Product" class="product-img" id="d-img">
+                </div>
+
+                <div class="dossier-content">
+                    <div class="content-header">
+                        <div class="tag-row">
+                            <span class="status-tag" id="d-tag">In Stock</span>
+                            <span class="status-tag" id="d-type">Sativa</span>
+                        </div>
+                        <h1 class="product-title" id="d-title">Azure</h1>
+                    </div>
+
+                    <p class="product-desc" id="d-desc">
+                        Description loading...
+                    </p>
+
+                    <div class="specs-grid">
+                        <div class="spec-item">
+                            <span class="spec-label">Potency Analysis</span>
+                            <div class="spec-value" id="d-thc">92% THC</div>
+                            <div class="intensity-track">
+                                <div class="intensity-fill" id="d-bar"></div>
+                            </div>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Terpene Profile</span>
+                            <div class="spec-value" id="d-terps">Limonene, Pinene</div>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Heating Core</span>
+                            <div class="spec-value" id="d-hw">Ceramic Mesh 2.0</div>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label">Tank Capacity</span>
+                            <div class="spec-value" id="d-cap">2.0g Liquid Diamonds</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</section>
+
+<!-- GUMMIES SECTION -->
+<section class="gummies" id="gummies">
+    <canvas id="gummies-canvas"></canvas>
+
+    <div class="gummies__content">
+        <span class="gummies__badge">New Arrival</span>
+        <h2 class="gummies__headline kinetic-text">Hasheesh<br><em>Gummies</em></h2>
+        <p class="gummies__body">Premium THCA in a delicious, precisely-dosed edible form. Each gummy delivers consistent potency with mouthwatering flavor.</p>
+        <a href="#faq" class="gummies__cta hover-trigger">Explore Gummies</a>
+    </div>
+</section>
+
+<!-- FAQ SECTION -->
+<section class="faq" id="faq">
+    <div class="faq__inner">
+        <div class="faq__header">
+            <span class="faq__eyebrow">Support</span>
+            <h2 class="faq__title kinetic-text">Frequently Asked<br><em>Questions</em></h2>
+        </div>
+
+        <div class="faq__list">
+            <div class="faq__item">
+                <button class="faq__question hover-trigger">
+                    <span>What is THCA and how is it different from THC?</span>
+                    <svg class="faq__icon" viewBox="0 0 24 24" width="24" height="24">
+                        <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+                <div class="faq__answer">
+                    <p>THCA (tetrahydrocannabinolic acid) is the non-psychoactive precursor to THC found naturally in raw cannabis. When heated through vaping or smoking, THCA converts to THC through decarboxylation. Our products contain federally compliant levels of Delta-9 THC.</p>
+                </div>
+            </div>
+
+            <div class="faq__item">
+                <button class="faq__question hover-trigger">
+                    <span>How do I use the Hasheesh vape pen?</span>
+                    <svg class="faq__icon" viewBox="0 0 24 24" width="24" height="24">
+                        <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+                <div class="faq__answer">
+                    <p>Our vape pens are draw-activated—no buttons required. Simply inhale from the mouthpiece to activate. Start with small puffs and wait a few minutes between draws to gauge your ideal dosage.</p>
+                </div>
+            </div>
+
+            <div class="faq__item">
+                <button class="faq__question hover-trigger">
+                    <span>Are your products lab tested?</span>
+                    <svg class="faq__icon" viewBox="0 0 24 24" width="24" height="24">
+                        <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+                <div class="faq__answer">
+                    <p>Absolutely. Every batch undergoes rigorous third-party laboratory testing for potency, purity, and safety. COAs are available for every product via the QR code on packaging.</p>
+                </div>
+            </div>
+
+            <div class="faq__item">
+                <button class="faq__question hover-trigger">
+                    <span>What is your shipping policy?</span>
+                    <svg class="faq__icon" viewBox="0 0 24 24" width="24" height="24">
+                        <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+                <div class="faq__answer">
+                    <p>Free standard shipping on orders over $75. Orders processed within 1-2 business days, arriving within 3-5 business days. Discreet packaging standard.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="faq__contact">
+            <p>Still have questions?</p>
+            <a href="mailto:hello@hasheesh.com" class="faq__contact-link hover-trigger">
+                <span>Contact Us</span>
+                <svg viewBox="0 0 24 24" width="20" height="20">
+                    <path d="M5 12h14M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer__bg-text">HASHEESH</div>
+    <div class="footer__inner">
+        <div class="footer__grid">
+            <div class="footer__col footer__col--brand">
+                <div class="footer__logo">
+                    <img src="images/logo.png" alt="Hasheesh Logo" style="max-width: 150px;">
+                </div>
+            </div>
+
+            <div class="footer__col footer__col--nav">
+                <h4>NAVIGATION</h4>
+                <a href="#hero" class="hover-trigger">Home</a>
+                <a href="#collection" class="hover-trigger">Collection</a>
+                <a href="#gummies" class="hover-trigger">Gummies</a>
+                <a href="#faq" class="hover-trigger">FAQ</a>
+            </div>
+
+            <div class="footer__col footer__col--legal">
+                <h4>LEGAL</h4>
+                <a href="#" class="footer__link-arrow hover-trigger">Terms of Service</a>
+                <a href="#" class="footer__link-arrow hover-trigger">Privacy Policy</a>
+                <a href="#" class="footer__link-arrow hover-trigger">Shipping Policy</a>
+            </div>
+
+            <div class="footer__col footer__col--fda">
+                <h4>FDA DISCLAIMER</h4>
+                <p class="footer__fda-text">
+                    These statements have not been evaluated by the Food and Drug Administration (FDA). These products are not intended to diagnose, treat, cure, or prevent any disease. Information provided is for educational purposes only and is not a substitute for professional medical advice. Consult a qualified healthcare professional before use, especially if you have a medical condition or take prescription medications.
+                </p>
+            </div>
+        </div>
+
+        <div class="footer__bottom">
+            <span>© 2025 Hasheesh. ALL RIGHTS RESERVED.</span>
+            <span>DESIGNED FOR EXCELLENCE.</span>
+        </div>
+    </div>
+</footer>
+
+<script>
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+    // ============================================
+    // GLOBAL STATE
+    // ============================================
+    let lenis;
+    const productDatabase = {
+        azure: {
+            title: "Azure",
+            type: "Sativa Dominant",
+            img: "images/azuregreenpen.png",
+            desc: "Designed for the creative mind. The Azure blend combines high-altitude Sativa strains with cool mint undertones. The result is a crisp, focusing high that avoids lethargy. Perfect for daytime use or artistic endeavors.",
+            thc: "92% THC",
+            potency: "92%",
+            terps: "Limonene, Beta-Pinene",
+            hardware: "Ceramic Mesh 2.0",
+            capacity: "2.0g / 500 Puffs"
+        },
+        champagne: {
+            title: "Champagne",
+            type: "Hybrid Balance",
+            img: "images/champagnegoldpen.png",
+            desc: "The gold standard of extraction. Champagne utilizes a proprietary triple-distillation process to ensure absolute purity. The flavor profile offers subtle notes of vanilla bean and aged oak, providing a balanced, euphoric lift.",
+            thc: "88% THC",
+            potency: "88%",
+            terps: "Caryophyllene, Linalool",
+            hardware: "Gold-Plated Coil",
+            capacity: "2.0g / 500 Puffs"
+        },
+        sakura: {
+            title: "Sakura",
+            type: "Indica Hybrid",
+            img: "images/sakurapinkpen.png",
+            desc: "A gentle embrace for the senses. Sakura extracts are sourced from early-harvest crops to preserve delicate floral esters. With hints of cherry blossom and sweet berry, this blend creates a calming, anti-anxiety effect without total sedation.",
+            thc: "85% THC",
+            potency: "85%",
+            terps: "Myrcene, Bisabolol",
+            hardware: "Soft-Heat Ceramic",
+            capacity: "1.5g / 350 Puffs"
+        },
+        silver: {
+            title: "Silver",
+            type: "Hybrid Clean",
+            img: "images/silverpen.png",
+            desc: "Minimalism perfected. The Silver edition uses cold-filtration technology to remove all plant waxes, resulting in a crystal-clear oil. The flavor is unadulterated and sharp, offering a high-energy, focused experience.",
+            thc: "90% THC",
+            potency: "90%",
+            terps: "Pinene, Limonene",
+            hardware: "Stainless Steel 316L",
+            capacity: "2.0g / 500 Puffs"
+        },
+        obsidian: {
+            title: "Obsidian",
+            type: "Heavy Indica",
+            img: "images/blackpen.png",
+            desc: "Dark, potent, and uncompromising. Obsidian is our strongest formulation, designed for experienced users. With deep earth and spice notes, it delivers immediate physical relaxation and sleep support.",
+            thc: "98% THC",
+            potency: "98%",
+            terps: "Humulene, Myrcene",
+            hardware: "High-Temp Ceramic",
+            capacity: "2.0g / 500 Puffs"
+        }
+    };
+
+    // ============================================
+    // INITIALIZATION
+    // ============================================
+    document.addEventListener('DOMContentLoaded', () => {
+        initPreloader();
+        initSmoothScroll();
+        initCursor();
+        initNavigation();
+        initHero();
+        initCollection();
+        initFAQ();
+        setupGummiesLazyLoad();
+    });
+
+    // ============================================
+    // PRELOADER
+    // ============================================
+    function initPreloader() {
+        const preloader = document.getElementById('preloader');
+        window.scrollTo(0, 0); // Force top on init
+
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                preloader.classList.add('hidden');
+                // Wait for preloader to fade out before enabling scroll
+                setTimeout(() => {
+                    document.body.classList.remove('loading');
+                    if (lenis) lenis.start();
+                    initKineticText();
+                    ScrollTrigger.refresh();
+                }, 800); // Match CSS transition duration
+            }, 800);
+        });
+    }
+
+    // ============================================
+    // SMOOTH SCROLL
+    // ============================================
+    function initSmoothScroll() {
+        history.scrollRestoration = 'manual';
+        window.scrollTo(0, 0);
+
+        lenis = new Lenis({
+            duration: 1.5,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            direction: 'vertical',
+            smooth: true,
+        });
+
+        lenis.stop(); // Stop initially
+
+        lenis.on('scroll', ScrollTrigger.update);
+
+        gsap.ticker.add((time) => {
+            lenis.raf(time * 1000);
+        });
+
+        gsap.ticker.lagSmoothing(0);
+
+        // Velocity-based skew
+        lenis.on('scroll', ({ velocity }) => {
+            const skewAmount = velocity * 0.05;
+            gsap.to('.kinetic-text', {
+                skewX: -skewAmount * 0.1,
+                overwrite: true,
+                duration: 0.1
+            });
+        });
+    }
+
+    // ============================================
+    // CURSOR
+    // ============================================
+    function initCursor() {
+        const cursor = document.querySelector('.cursor');
+        const mouse = { x: 0, y: 0 };
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+            gsap.to(cursor, { x: e.clientX, y: e.clientY, duration: 0.1, opacity: 0.7 });
+        });
+
+        document.querySelectorAll('.hover-trigger').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursor.classList.add('active');
+
+                // Magnetic effect
+                const rect = el.getBoundingClientRect();
+                const moveHandler = (e) => {
+                    const x = e.clientX - rect.left - rect.width / 2;
+                    const y = e.clientY - rect.top - rect.height / 2;
+                    gsap.to(el, { x: x * 0.3, y: y * 0.3, duration: 0.3, ease: 'power2.out' });
+                };
+                el.addEventListener('mousemove', moveHandler);
+                el.dataset.moveHandler = moveHandler;
+            });
+
+            el.addEventListener('mouseleave', () => {
+                cursor.classList.remove('active');
+                gsap.to(el, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.3)' });
+                if (el.dataset.moveHandler) {
+                    el.removeEventListener('mousemove', el.dataset.moveHandler);
+                }
+            });
+        });
+    }
+
+    // ============================================
+    // NAVIGATION
+    // ============================================
+    function initNavigation() {
+        const nav = document.getElementById('mainNav');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        // Smooth scroll to sections
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = item.getAttribute('href');
+                lenis.scrollTo(target, { duration: 2 });
+            });
+        });
+
+        // Active state on scroll
+        const sections = ['hero', 'collection', 'gummies', 'faq'];
+        sections.forEach(section => {
+            ScrollTrigger.create({
+                trigger: `#${section}`,
+                start: 'top center',
+                end: 'bottom center',
+                onEnter: () => updateNavActive(section),
+                onEnterBack: () => updateNavActive(section)
+            });
+        });
+
+        // Background on scroll
+        ScrollTrigger.create({
+            trigger: '.hero-wrapper',
+            start: 'bottom top',
+            onEnter: () => nav.classList.add('scrolled'),
+            onLeaveBack: () => nav.classList.remove('scrolled')
+        });
+
+        function updateNavActive(section) {
+            navItems.forEach(item => {
+                item.classList.toggle('active', item.dataset.section === section);
+            });
+        }
+    }
+
+    // ============================================
+    // HERO ANIMATIONS
+    // ============================================
+    function initHero() {
+        // Intro animation
+        const tl = gsap.timeline();
+        tl.from('.grid-line', { scaleY: 0, transformOrigin: 'top', duration: 0.6, stagger: 0.06, ease: "power3.inOut" })
+            .from('.nav-top', { opacity: 0, y: -20, duration: 0.5 }, "-=0.3")
+            .from('.bg-layer', { opacity: 0, y: 50, rotation: "+=15", duration: 0.8, stagger: 0.1, ease: "expo.out" }, "-=0.2")
+            .from('.big-text', { y: 60, opacity: 0, duration: 0.8, ease: "power3.out" }, "-=0.6")
+            .from('.fg-layer', { opacity: 0, scale: 1.1, duration: 0.8, ease: "power3.out" }, "-=0.6")
+            .from('.pen-hero', { scale: 0.8, opacity: 0, y: 60, duration: 1, ease: "expo.out" }, "-=0.6");
+
+        // Scroll-driven animations
+        let heroScrollRotation = -12;
+        let heroScrollScale = 1;
+        let heroScrollY = 0;
+        let flavor1X = 0, flavor2X = 0, flavor3X = 0, flavor4X = 0;
+
+        const scrollTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: ".hero-wrapper",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 3
+            }
+        });
+
+        // Clear stage
+        scrollTl.to(".bg-layer", { y: -window.innerHeight * 2.5, opacity: 0, ease: "power2.in" }, 0)
+            .to(".bg-layer", {}, 0.08)
+            .to(".fg-layer", { y: -window.innerHeight * 3, opacity: 0, ease: "power2.in" }, 0)
+            .to(".fg-layer", {}, 0.08)
+            .to(".big-text", { y: -window.innerHeight * 1.5, opacity: 0, ease: "power1.inOut" }, 0)
+            .to(".big-text", {}, 0.12)
+            .to(".grid-line", { y: -window.innerHeight * 0.5, ease: "none" }, 0)
+            .to(".grid-line", {}, 0.3);
+
+        // Hero transform
+        scrollTl.to({ rotation: -12, scale: 1, y: 0 }, {
+            rotation: 0,
+            scale: 0.75,
+            y: -window.innerHeight * 0.09,
+            ease: "power2.inOut",
+            onUpdate: function() {
+                heroScrollRotation = this.targets()[0].rotation;
+                heroScrollScale = this.targets()[0].scale;
+                heroScrollY = this.targets()[0].y;
+            }
+        }, 0.15)
+            .to(".orb-3", { opacity: 0.35, scale: 1.5, ease: "power2.inOut" }, 0.15)
+            .to(".orb-1, .orb-2", { opacity: 0.05, ease: "power2.inOut" }, 0.15)
+            .to(".grid-line", { y: 0, opacity: 0.3, ease: "power2.inOut" }, 0.15)
+            .to({}, {}, 0.50);
+
+        // Splay animation
+        scrollTl.set([".pen-flavor-1", ".pen-flavor-2", ".pen-flavor-3", ".pen-flavor-4"], {
+            opacity: 1,
+            scale: 0.75,
+            y: -window.innerHeight * 0.09
+        }, 0.60);
+
+        scrollTl.to(".pen-flavor-1", {
+            x: -window.innerWidth * 0.32,
+            ease: "power3.out",
+            onUpdate: function() { flavor1X = gsap.getProperty(".pen-flavor-1", "x"); }
+        }, 0.60)
+            .to(".pen-flavor-2", {
+                x: -window.innerWidth * 0.16,
+                ease: "power3.out",
+                onUpdate: function() { flavor2X = gsap.getProperty(".pen-flavor-2", "x"); }
+            }, 0.60)
+            .to(".pen-flavor-3", {
+                x: window.innerWidth * 0.16,
+                ease: "power3.out",
+                onUpdate: function() { flavor3X = gsap.getProperty(".pen-flavor-3", "x"); }
+            }, 0.60)
+            .to(".pen-flavor-4", {
+                x: window.innerWidth * 0.32,
+                ease: "power3.out",
+                onUpdate: function() { flavor4X = gsap.getProperty(".pen-flavor-4", "x"); }
+            }, 0.60)
+            .to({}, {}, 1.0);
+
+        // Labels
+        scrollTl.to(".pen-labels", { opacity: 1, duration: 0.1, ease: "power2.out" }, 0.75)
+            .to(".label-1", { opacity: 1, y: 0, duration: 0.15, ease: "power3.out" }, 0.77)
+            .to(".label-2", { opacity: 1, y: 0, duration: 0.15, ease: "power3.out" }, 0.80)
+            .to(".label-hero", { opacity: 1, y: 0, duration: 0.15, ease: "power3.out" }, 0.83)
+            .to(".label-3", { opacity: 1, y: 0, duration: 0.15, ease: "power3.out" }, 0.86)
+            .to(".label-4", { opacity: 1, y: 0, duration: 0.15, ease: "power3.out" }, 0.89);
+
+        // Scroll indicator
+        scrollTl.to(".hero-scroll-indicator", { opacity: 1, y: 0, duration: 0.1 }, 0.85);
+
+        // Mouse parallax
+        let mouse = { x: 0, y: 0 };
+        let target = { x: 0, y: 0 };
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
+            mouse.y = (e.clientY / window.innerHeight - 0.5) * 2;
+        });
+
+        gsap.ticker.add(() => {
+            target.x += (mouse.x - target.x) * 0.08;
+            target.y += (mouse.y - target.y) * 0.08;
+
+            gsap.set(".big-text", { x: target.x * -25, rotation: target.x * 2 });
+            gsap.set(".pen-bg-1", { x: target.x * -35, rotation: -25 + (target.x * 3) });
+            gsap.set(".pen-bg-2", { x: target.x * -40, rotation: 30 + (target.y * 4) });
+            gsap.set(".pen-bg-3", { x: target.x * -30, rotation: 75 + (target.x * 2) });
+
+            gsap.set(".pen-hero", {
+                x: target.x * 10,
+                y: heroScrollY + (target.y * 10),
+                scale: heroScrollScale,
+                rotation: heroScrollRotation + (target.x * 4)
+            });
+
+            gsap.set(".pen-flavor-1", {
+                x: flavor1X + (target.x * 10),
+                y: heroScrollY + (target.y * 10),
+                rotation: target.x * 4
+            });
+
+            gsap.set(".pen-flavor-2", {
+                x: flavor2X + (target.x * 10),
+                y: heroScrollY + (target.y * 10),
+                rotation: target.x * 4
+            });
+
+            gsap.set(".pen-flavor-3", {
+                x: flavor3X + (target.x * 10),
+                y: heroScrollY + (target.y * 10),
+                rotation: target.x * 4
+            });
+
+            gsap.set(".pen-flavor-4", {
+                x: flavor4X + (target.x * 10),
+                y: heroScrollY + (target.y * 10),
+                rotation: target.x * 4
+            });
+
+            gsap.set(".pen-fg-1", { x: target.x * 70, rotation: 55 + (target.x * 12) });
+            gsap.set(".pen-fg-2", { x: target.x * 65, rotation: -50 + (target.y * 10) });
+        });
+    }
+
+    // ============================================
+    // COLLECTION
+    // ============================================
+    function initCollection() {
+        const card = document.getElementById('card');
+        const els = {
+            img: document.getElementById('d-img'),
+            title: document.getElementById('d-title'),
+            type: document.getElementById('d-type'),
+            desc: document.getElementById('d-desc'),
+            thc: document.getElementById('d-thc'),
+            bar: document.getElementById('d-bar'),
+            terps: document.getElementById('d-terps'),
+            hw: document.getElementById('d-hw'),
+            cap: document.getElementById('d-cap')
+        };
+
+        // Load initial data
+        const firstKey = 'azure';
+        const firstData = productDatabase[firstKey];
+        updateProductDisplay(firstData);
+
+        // Click handlers
+        document.querySelectorAll('.collection-nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (item.classList.contains('active')) return;
+
+                document.querySelectorAll('.collection-nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+
+                const key = item.getAttribute('data-id');
+                const data = productDatabase[key];
+
+                card.classList.add('changing');
+
+                setTimeout(() => {
+                    updateProductDisplay(data);
+                    setTimeout(() => {
+                        card.classList.remove('changing');
+                        setTimeout(() => {
+                            els.bar.style.width = data.potency;
+                        }, 100);
+                    }, 50);
+                }, 400);
+            });
+        });
+
+        function updateProductDisplay(data) {
+            els.img.src = data.img;
+            els.title.innerText = data.title;
+            els.type.innerText = data.type;
+            els.desc.innerText = data.desc;
+            els.thc.innerText = data.thc;
+            els.terps.innerText = data.terps;
+            els.hw.innerText = data.hardware;
+            els.cap.innerText = data.capacity;
+        }
+
+        // Entrance animation
+        ScrollTrigger.create({
+            trigger: ".collection",
+            start: "top 80%",
+            once: true,
+            onEnter: () => {
+                gsap.from(".collection-sidebar", {
+                    x: -100,
+                    opacity: 0,
+                    duration: 1,
+                    ease: "power3.out"
+                });
+                gsap.from(".dossier-card", {
+                    scale: 0.9,
+                    opacity: 0,
+                    duration: 1.2,
+                    ease: "power3.out",
+                    delay: 0.2
+                });
+                setTimeout(() => {
+                    els.bar.style.width = firstData.potency;
+                }, 500);
+            }
+        });
+
+        // Scroll-based product switching
+        const productKeys = ['azure', 'champagne', 'sakura', 'silver', 'obsidian'];
+        const totalProducts = productKeys.length;
+
+        ScrollTrigger.create({
+            trigger: ".collection-wrapper",
+            start: "top 60px", // Changed from 80px
+            end: "bottom bottom",
+            scrub: true,
+            onUpdate: (self) => {
+                const progress = self.progress;
+                const index = Math.min(Math.floor(progress * totalProducts), totalProducts - 1);
+                const key = productKeys[index];
+
+                // Only update if changed
+                const currentActive = document.querySelector('.collection-nav-item.active');
+                if (currentActive && currentActive.getAttribute('data-id') !== key) {
+                    // Update nav
+                    document.querySelectorAll('.collection-nav-item').forEach(i => i.classList.remove('active'));
+                    const newItem = document.querySelector(`.collection-nav-item[data-id="${key}"]`);
+                    if (newItem) newItem.classList.add('active');
+
+                    // Update card
+                    const data = productDatabase[key];
+                    card.classList.add('changing');
+
+                    setTimeout(() => {
+                        updateProductDisplay(data);
+                        setTimeout(() => {
+                            card.classList.remove('changing');
+                            setTimeout(() => {
+                                els.bar.style.width = data.potency;
+                            }, 100);
+                        }, 50);
+                    }, 400);
+                }
+            }
+        });
+    }
+
+    // ============================================
+    // KINETIC TEXT
+    // ============================================
+    function initKineticText() {
+        const textElements = document.querySelectorAll('.kinetic-text');
+        textElements.forEach(el => {
+            if (el.querySelectorAll('.char').length > 0) return;
+            const split = new SplitType(el, { types: 'chars' });
+            gsap.set(split.chars, { y: 100, opacity: 0, rotateX: -90 });
+            ScrollTrigger.create({
+                trigger: el,
+                start: 'top 85%',
+                onEnter: () => {
+                    gsap.to(split.chars, {
+                        y: 0,
+                        opacity: 1,
+                        rotateX: 0,
+                        duration: 1,
+                        stagger: 0.02,
+                        ease: 'back.out(1.7)'
+                    });
+                }
+            });
+        });
+    }
+
+    // ============================================
+    // GUMMIES (LAZY LOADED)
+    // ============================================
+    function setupGummiesLazyLoad() {
+        ScrollTrigger.create({
+            trigger: ".gummies",
+            start: "top bottom+=500px",
+            once: true,
+            onEnter: () => initGummies()
+        });
+    }
+
+    async function initGummies() {
+        const canvas = document.getElementById('gummies-canvas');
+        const section = document.querySelector('.gummies');
+        if (!canvas || !section) return;
+
+        let THREE, GLTFLoader, SkeletonUtils;
+        try {
+            THREE = await import('three');
+            const gltfModule = await import('three/addons/loaders/GLTFLoader.js');
+            const skeletonModule = await import('three/addons/utils/SkeletonUtils.js');
+            GLTFLoader = gltfModule.GLTFLoader;
+            SkeletonUtils = skeletonModule.SkeletonUtils;
+        } catch (e) {
+            console.error('Failed to load Three.js:', e);
+            return;
+        }
+
+        const scene = new THREE.Scene();
+        scene.background = null;
+
+        const camera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+        camera.position.z = 20;
+
+        const renderer = new THREE.WebGLRenderer({
+            canvas,
+            antialias: true,
+            alpha: true,
+            powerPreference: 'high-performance'
+        });
+        renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        const ambient = new THREE.AmbientLight(0xffffff, 0.7);
+        scene.add(ambient);
+        const directional = new THREE.DirectionalLight(0xffffff, 0.9);
+        directional.position.set(5, 10, 7);
+        scene.add(directional);
+
+        const colors = [0xE74C3C, 0xF39C12, 0xF1C40F, 0x2ECC71, 0x9B59B6, 0xE91E63, 0x3498DB, 0x1ABC9C];
+        const gummies = [];
+        const gummyCount = 100;
+
+        function setupGummy(mesh, index, baseScale = 1) {
+            const randScale = (0.6 + Math.random() * 0.5) * baseScale;
+            mesh.userData.baseScale = randScale;
+            mesh.position.set((Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4, (Math.random() - 0.5) * 4);
+            mesh.userData.startPos = mesh.position.clone();
+            mesh.userData.targetPos = new THREE.Vector3(
+                (Math.random() - 0.5) * 80,
+                (Math.random() - 0.5) * 60,
+                (Math.random() - 0.5) * 30
+            );
+            mesh.rotation.set(Math.random() * Math.PI * 2, Math.random() * Math.PI * 2, Math.random() * Math.PI * 2);
+            mesh.userData.rotSpeed = {
+                x: (Math.random() - 0.5) * 0.01,
+                y: (Math.random() - 0.5) * 0.01,
+                z: (Math.random() - 0.5) * 0.01
+            };
+            mesh.scale.set(0, 0, 0);
+        }
+
+        function createFallbackGummies() {
+            for (let i = 0; i < gummyCount; i++) {
+                const geometry = new THREE.SphereGeometry(0.7, 16, 16);
+                const material = new THREE.MeshStandardMaterial({
+                    color: colors[i % colors.length],
+                    roughness: 0.3,
+                    metalness: 0.2
+                });
+                const mesh = new THREE.Mesh(geometry, material);
+                setupGummy(mesh, i, 1);
+                scene.add(mesh);
+                gummies.push(mesh);
+            }
+        }
+
+        // Try to load GLB, fallback to spheres
+        createFallbackGummies();
+
+        let explosionProgress = 0;
+        ScrollTrigger.create({
+            trigger: section,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: 0.5,
+            onUpdate: (self) => {
+                explosionProgress = self.progress;
+            }
+        });
+
+        // Mouse parallax for gummies
+        let mouseX = 0;
+        let mouseY = 0;
+        window.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+            mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+        });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            if (gummies.length === 0) return;
+
+            // Parallax
+            camera.position.x += (mouseX * 2 - camera.position.x) * 0.05;
+            camera.position.y += (-mouseY * 2 - camera.position.y) * 0.05;
+            camera.lookAt(scene.position);
+
+            gummies.forEach((gummy) => {
+                const scaleProgress = Math.min(explosionProgress * 2.5, 1);
+                const s = gsap.parseEase('power2.out')(scaleProgress) * (gummy.userData.baseScale || 1);
+                gummy.scale.set(s, s, s);
+
+                const moveProgress = Math.max((explosionProgress - 0.15) * 1.3, 0);
+                const easedMove = gsap.parseEase('power2.out')(Math.min(moveProgress, 1));
+                gummy.position.lerpVectors(gummy.userData.startPos, gummy.userData.targetPos, easedMove);
+
+                gummy.rotation.x += gummy.userData.rotSpeed.x;
+                gummy.rotation.y += gummy.userData.rotSpeed.y;
+                gummy.rotation.z += gummy.userData.rotSpeed.z;
+            });
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = canvas.clientWidth / canvas.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
+        });
+    }
+
+    // ============================================
+    // FAQ
+    // ============================================
+    function initFAQ() {
+        const items = document.querySelectorAll('.faq__item');
+        items.forEach(item => {
+            const question = item.querySelector('.faq__question');
+            question.addEventListener('click', () => {
+                const isActive = item.classList.contains('active');
+                items.forEach(other => other.classList.remove('active'));
+                if (!isActive) item.classList.add('active');
+            });
+        });
+    }
+</script>
+
+</body>
+</html>
