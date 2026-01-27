@@ -63,7 +63,8 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        body.loading {
+        body.loading,
+        body.animating {
             overflow: hidden;
         }
 
@@ -268,7 +269,7 @@
             top: 0;
             left: 0;
             width: 100%;
-            padding: 15px 40px;
+            padding: 10px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -294,7 +295,7 @@
         }
 
         .logo img {
-            height: 95px;
+            height: 85px;
             width: auto;
         }
 
@@ -440,7 +441,7 @@
 
         .big-text {
             position: absolute;
-            width: clamp(400px, 70vw, 1400px);
+            width: clamp(550px, 90vw, 2000px);
             height: auto;
             z-index: 10;
             top: 50%;
@@ -502,8 +503,8 @@
         }
 
         .pen-flavor {
-            width: 82vw;
-            height: 134vh;
+            width: 70vw;
+            height: 110vh;
             position: absolute;
             top: 50%;
             left: 50%;
@@ -511,6 +512,9 @@
             z-index: 14;
             filter: drop-shadow(0 20px 40px rgba(0,0,0,0.2));
             opacity: 0;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
         }
 
         .pen-flavor-1 {
@@ -584,7 +588,7 @@
 
         .label-1 {
             right: 35vw;
-            top: 28%;
+            top: 30%;
             bottom: auto;
             left: auto;
             text-align: left;
@@ -603,7 +607,7 @@
         .label-3 {
             right: 5vw;
             left: auto;
-            top: 72%;
+            top: 70%;
             bottom: auto;
             text-align: left;
             flex-direction: row;
@@ -654,9 +658,9 @@
         }
 
         .collection-sidebar {
-            height: calc(100vh - 60px);
+            height: calc(100vh - 80px);
             position: sticky;
-            top: 60px;
+            top: 80px;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -671,9 +675,10 @@
         .eyebrow {
             font-family: var(--font-mono);
             font-size: 0.7rem;
-            color: var(--text-muted);
+            color: var(--text-dark);
             letter-spacing: 0.25em;
             text-transform: uppercase;
+            opacity: 0.7;
         }
 
         .nav-list {
@@ -686,12 +691,12 @@
         .collection-nav-item {
             cursor: none;
             position: relative;
-            opacity: 0.5;
+            opacity: 0.75;
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
         .collection-nav-item:hover {
-            opacity: 0.8;
+            opacity: 0.9;
             transform: translateX(5px);
         }
 
@@ -744,18 +749,18 @@
             color: var(--gold);
             text-transform: uppercase;
             letter-spacing: 0.15em;
-            opacity: 0.8;
+            opacity: 0.95;
         }
 
         .dossier-stage {
-            height: calc(100vh - 60px);
+            height: calc(100vh - 90px);
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
             perspective: 1500px;
             position: sticky;
-            top: 60px;
+            top: 90px;
         }
 
         .dossier-card {
@@ -782,15 +787,15 @@
             align-items: center;
             justify-content: center;
             border-right: 1px solid rgba(31, 29, 26, 0.06);
-            padding: 40px;
+            padding: 30px;
         }
 
         .product-img {
             width: 100%;
-            max-width: 1800px;
+            max-width: 2200px;
             height: auto;
             filter: drop-shadow(0 20px 40px rgba(0,0,0,0.2));
-            transform: rotate(-8deg);
+            transform: rotate(-8deg) scale(1.15);
             opacity: 1;
             transition: opacity 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
@@ -1058,7 +1063,7 @@
         }
 
         .education__inner {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 0 clamp(20px, 5vw, 60px);
         }
@@ -1075,7 +1080,7 @@
             font-weight: 600;
             letter-spacing: 0.15em;
             text-transform: uppercase;
-            color: var(--accent-gold);
+            color: var(--gold);
             margin-bottom: 20px;
         }
 
@@ -1096,88 +1101,347 @@
             line-height: 1.8;
             color: var(--text-dark);
             opacity: 0.8;
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
         }
 
-        .education__content {
+        /* Museum Exhibition Layout */
+        .education__exhibition {
+            margin-top: 80px;
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: 1fr auto 1fr;
             gap: 60px;
+            align-items: center;
+            margin-bottom: 80px;
+        }
+
+        .education__specimen {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(184, 148, 95, 0.15);
+            border-radius: 16px;
+            padding: 50px 40px 45px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+        }
+
+        .education__specimen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gold-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .education__specimen:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            border-color: rgba(184, 148, 95, 0.3);
+        }
+
+        .education__specimen:hover::before {
+            opacity: 1;
+        }
+
+        .education__specimen-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, rgba(197, 160, 89, 0.1), rgba(197, 160, 89, 0.05));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: var(--gold);
+        }
+
+        .education__specimen-icon svg {
+            width: 40px;
+            height: 40px;
+            stroke: var(--gold);
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: all 0.3s ease;
+        }
+
+        .education__specimen:hover .education__specimen-icon svg {
+            transform: scale(1.1);
+            stroke: var(--gold-bright);
+            filter: drop-shadow(0 2px 8px rgba(197, 160, 89, 0.3));
+        }
+
+        .education__specimen-label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .education__specimen-name {
+            font-family: var(--font-display);
+            font-size: 2.2rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 18px;
+            line-height: 1.2;
+        }
+
+        .education__specimen-props {
+            list-style: none;
+            padding: 0;
+            margin: 26px 0;
+            text-align: left;
+        }
+
+        .education__specimen-prop {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            opacity: 0.8;
+            margin-bottom: 12px;
+            padding-left: 20px;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .education__specimen-prop::before {
+            content: '●';
+            position: absolute;
+            left: 0;
+            color: var(--gold);
+            font-size: 0.7rem;
+        }
+
+        .education__specimen-formula {
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gold);
+            background: rgba(197, 160, 89, 0.08);
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-top: 24px;
+            display: inline-block;
+            letter-spacing: 0.05em;
+            line-height: 1.6;
+        }
+
+        .education__specimen-formula sub {
+            font-size: 0.7em;
+            vertical-align: baseline;
+            position: relative;
+            bottom: -0.25em;
+        }
+
+        /* Transformation Arrow */
+        .education__transformation {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .education__transform-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gold-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            box-shadow: 0 4px 20px rgba(197, 160, 89, 0.3);
+            animation: pulse-glow 2s infinite ease-in-out;
+        }
+
+        .education__transform-icon svg {
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 4px 20px rgba(197, 160, 89, 0.3);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 8px 30px rgba(197, 160, 89, 0.5);
+                transform: scale(1.05);
+            }
+        }
+
+        .education__transform-label {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .education__transform-process {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: center;
+            line-height: 1.6;
+            max-width: 140px;
+        }
+
+        /* Specifications Grid */
+        .education__specs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
             margin-top: 60px;
         }
 
-        .education__block {
-            background: rgba(255, 255, 255, 0.4);
-            border: 1px solid rgba(184, 148, 95, 0.2);
-            border-radius: 20px;
-            padding: 50px;
-            transition: all 0.4s ease;
+        .education__spec-card {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(184, 148, 95, 0.15);
+            border-radius: 16px;
+            padding: 40px;
+            transition: all 0.3s ease;
         }
 
-        .education__block:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
-            border-color: rgba(184, 148, 95, 0.4);
+        .education__spec-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+            border-color: rgba(184, 148, 95, 0.25);
         }
 
-        .education__block-title {
-            font-family: var(--font-display);
-            font-size: 2rem;
-            font-weight: 500;
-            color: var(--text-dark);
-            margin-bottom: 25px;
-        }
-
-        .education__block-text {
-            font-size: 1.05rem;
-            line-height: 1.9;
-            color: var(--text-dark);
-            opacity: 0.85;
-            margin-bottom: 20px;
-        }
-
-        .education__highlight {
-            background: linear-gradient(135deg, rgba(184, 148, 95, 0.15), rgba(184, 148, 95, 0.05));
-            border-left: 3px solid var(--accent-gold);
-            padding: 25px 30px;
-            border-radius: 10px;
-            margin-top: 30px;
-        }
-
-        .education__highlight-title {
+        .education__spec-title {
             font-family: var(--font-mono);
-            font-size: 0.85rem;
-            font-weight: 600;
-            letter-spacing: 0.1em;
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
             text-transform: uppercase;
-            color: var(--accent-gold);
-            margin-bottom: 15px;
+            color: var(--gold);
+            margin-bottom: 20px;
+            font-weight: 600;
         }
 
-        .education__highlight-text {
+        .education__spec-content {
             font-size: 1rem;
             line-height: 1.8;
             color: var(--text-dark);
+            opacity: 0.85;
+        }
+
+        .education__blend {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .education__blend-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .education__blend-bar {
+            flex: 1;
+            height: 8px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .education__blend-fill {
+            height: 100%;
+            background: var(--gold-gradient);
+            border-radius: 4px;
+            transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .education__blend-label {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            font-weight: 600;
+            min-width: 110px;
+        }
+
+        .education__blend-value {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--gold);
+            font-weight: 600;
+            min-width: 45px;
+            text-align: right;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .education__exhibition {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .education__transformation {
+                /* Removed rotation - was causing text to be sideways */
+                flex-direction: row;
+                justify-content: center;
+                padding: 20px 0;
+            }
+
+            .education__transform-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+            }
+
+            .education__specs {
+                grid-template-columns: 1fr;
+            }
         }
 
         @media (max-width: 768px) {
-            .education__block {
+            .education__specimen {
+                padding: 35px 25px;
+            }
+
+            .education__specimen-name {
+                font-size: 1.8rem;
+            }
+
+            .education__spec-card {
                 padding: 30px 25px;
             }
 
-            .education__block-title {
-                font-size: 1.6rem;
-            }
-
-            .education__highlight {
-                padding: 20px;
+            .education__specimen-formula {
+                font-size: 1rem;
+                padding: 10px 16px;
             }
         }
 
         /* ============================================
            WHY US SECTION
            ============================================ */
+
+        /* Certification Link Hover Effect */
+        .certification-link:hover {
+            color: var(--gold-bright) !important;
+            border-bottom-color: var(--gold-bright) !important;
+            transform: translateY(-2px);
+            gap: 10px !important;
+        }
+
+        .certification-link:hover svg {
+            transform: scale(1.1);
+        }
+
         .why-us {
             position: relative;
             padding: clamp(80px, 12vh, 150px) 0;
@@ -1381,7 +1645,7 @@
             font-weight: 600;
             letter-spacing: 0.15em;
             text-transform: uppercase;
-            color: var(--accent-gold);
+            color: var(--gold);
             margin-bottom: 20px;
         }
 
@@ -1443,7 +1707,7 @@
         .form-input:focus,
         .form-textarea:focus {
             outline: none;
-            border-color: var(--accent-gold);
+            border-color: var(--gold);
             background: rgba(255, 255, 255, 1);
             box-shadow: 0 0 0 3px rgba(184, 148, 95, 0.1);
         }
@@ -1462,7 +1726,7 @@
             letter-spacing: 0.1em;
             text-transform: uppercase;
             color: #fff;
-            background: linear-gradient(135deg, var(--accent-gold), #9d7a4a);
+            background: linear-gradient(135deg, var(--gold-bright), var(--gold));
             border: none;
             border-radius: 10px;
             cursor: pointer;
@@ -1523,7 +1787,7 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent-gold), #9d7a4a);
+            background: linear-gradient(135deg, var(--gold-bright), var(--gold));
             border: none;
             cursor: pointer;
             display: flex;
@@ -1551,20 +1815,27 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0);
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
             z-index: 9999;
-            display: none;
+            display: flex;  /* ← CHANGED: always flex, use opacity/pointer-events */
             align-items: flex-end;
             justify-content: flex-end;
             padding: 20px;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            pointer-events: none;  /* ← ADD THIS: prevents clicks when hidden */
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+            background 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+            backdrop-filter 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .fab-modal.active {
-            display: flex;
             opacity: 1;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            pointer-events: auto;  /* ← ADD THIS: enables clicks when visible */
         }
 
         .fab-modal-content {
@@ -1576,15 +1847,51 @@
             overflow-y: auto;
             padding: 40px;
             position: relative;
-            transform: scale(0);
+            transform: translateY(30px) scale(0.9);
             transform-origin: bottom right;
-            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            opacity: 0;
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+            opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             margin-bottom: 10px;
             margin-right: 10px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
         .fab-modal.active .fab-modal-content {
-            transform: scale(1);
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        /* Smooth FAB button pulse on hover */
+        .fab-button {
+            position: relative;
+        }
+
+        .fab-button::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .fab-button:hover::before {
+            opacity: 0.3;
+            animation: pulse-ring 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(1);
+                opacity: 0.3;
+            }
+            100% {
+                transform: scale(1.3);
+                opacity: 0;
+            }
         }
 
         .fab-close,
@@ -1822,7 +2129,7 @@
         @media (max-width: 950px) {
             /* Navigation */
             .nav-top {
-                padding: 20px;
+                padding: 15px;
             }
 
             .nav-links {
@@ -1839,7 +2146,7 @@
             }
 
             .big-text {
-                width: clamp(300px, 80vw, 700px);
+                width: clamp(350px, 90vw, 850px);
             }
 
             /* Hide background/foreground blur pens on mobile */
@@ -1855,8 +2162,8 @@
             }
 
             .pen-flavor {
-                width: 72vw;
-                height: 128vh;
+                width: 60vw;
+                height: 100vh;
             }
 
             /* Mobile labels - positioned at bottom center */
@@ -1872,9 +2179,9 @@
                 gap: 6px;
             }
 
-            .label-1 { right: 30vw; left: auto; top: 28%; bottom: auto; flex-direction: row; text-align: left; }
+            .label-1 { right: 30vw; left: auto; top: 30%; bottom: auto; flex-direction: row; text-align: left; }
             .label-hero { right: 17vw; left: auto; top: 50%; bottom: auto; flex-direction: row; text-align: left; }
-            .label-3 { right: 4vw; left: auto; top: 72%; bottom: auto; flex-direction: row; text-align: left; }
+            .label-3 { right: 4vw; left: auto; top: 70%; bottom: auto; flex-direction: row; text-align: left; }
 
             .label-name {
                 font-size: 0.65rem;
@@ -1975,8 +2282,8 @@
             }
 
             .product-img {
-                max-width: 220px;
-                transform: rotate(-5deg);
+                max-width: 260px;
+                transform: rotate(-5deg) scale(1.1);
             }
 
             .dossier-content {
@@ -2096,7 +2403,7 @@
             }
 
             .logo img {
-                height: 50px;
+                height: 45px;
             }
 
             .nav-links {
@@ -2108,7 +2415,7 @@
             }
 
             .big-text {
-                width: clamp(250px, 85vw, 550px);
+                width: clamp(300px, 92vw, 650px);
             }
 
             .pen-hero {
@@ -2117,8 +2424,8 @@
             }
 
             .pen-flavor {
-                width: 44vw;
-                height: 82vh;
+                width: 50vw;
+                height: 85vh;
             }
 
             /* Even smaller labels on small phones */
@@ -2159,7 +2466,7 @@
             }
 
             .product-img {
-                max-width: 160px;
+                max-width: 180px;
             }
 
             .dossier-content {
@@ -2376,25 +2683,102 @@
             <p class="education__intro">THCa (tetrahydrocannabinolic acid) is a naturally occurring cannabinoid synthesized in the trichomes of raw hemp flower. It is the acidic precursor to THC and represents the dominant cannabinoid form present in unprocessed cannabis and hemp plants.</p>
         </div>
 
-        <div class="education__content">
-            <div class="education__block">
-                <h3 class="education__block-title">The Science of THCa</h3>
-                <p class="education__block-text">In its native state, THCa is non-intoxicating due to its molecular structure, which limits direct interaction with CB1 receptors in the endocannabinoid system.</p>
-                <p class="education__block-text">When heat is applied through vaping, smoking, or cooking, THCa undergoes decarboxylation—a process that removes a carboxyl group (-COOH) and converts it into THC.</p>
-                <div class="education__highlight">
-                    <div class="education__highlight-title">Our Formulation</div>
-                    <p class="education__highlight-text">Each HaSheesh vape contains a precisely balanced blend: <strong>50% THCa</strong>, <strong>15% THCP</strong>, and <strong>35% HHC</strong>—engineered for optimal potency and effect profile.</p>
+        <!-- Museum Exhibition: Side-by-Side Comparison -->
+        <div class="education__exhibition">
+            <!-- THCa Specimen -->
+            <div class="education__specimen">
+                <div class="education__specimen-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2C9.5 4 7 7 7 12c0 2.5 1 4 2 5 1 1 2 1 3 1s2 0 3-1c1-1 2-2.5 2-5 0-5-2.5-8-5-10z"/>
+                        <path d="M12 18v4"/>
+                        <path d="M8 12c-1.5 0-3 .5-4 1.5"/>
+                        <path d="M16 12c1.5 0 3 .5 4 1.5"/>
+                    </svg>
+                </div>
+                <div class="education__specimen-label">Raw State</div>
+                <h3 class="education__specimen-name">THCa</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.7;">In its native state, THCa is non-intoxicating due to its molecular structure.</p>
+                <ul class="education__specimen-props">
+                    <li class="education__specimen-prop">Non-psychoactive compound</li>
+                    <li class="education__specimen-prop">Contains -COOH group</li>
+                    <li class="education__specimen-prop">Limited CB1 receptor interaction</li>
+                    <li class="education__specimen-prop">Naturally occurring in raw hemp</li>
+                </ul>
+                <div class="education__specimen-formula">C<sub>22</sub>H<sub>30</sub>O<sub>4</sub></div>
+            </div>
+
+            <!-- Transformation Process -->
+            <div class="education__transformation">
+                <div class="education__transform-icon">
+                    <svg viewBox="0 0 24 24" width="32" height="32" fill="white" stroke="white" stroke-width="1.5">
+                        <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+                    </svg>
+                </div>
+                <div class="education__transform-label">Decarboxylation</div>
+                <p class="education__transform-process">Heat removes carboxyl group (-COOH)</p>
+            </div>
+
+            <!-- THC Specimen -->
+            <div class="education__specimen">
+                <div class="education__specimen-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/>
+                    </svg>
+                </div>
+                <div class="education__specimen-label">Active State</div>
+                <h3 class="education__specimen-name">THC</h3>
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.7;">After decarboxylation, THC becomes bioavailable and receptor-active.</p>
+                <ul class="education__specimen-props">
+                    <li class="education__specimen-prop">Psychoactive compound</li>
+                    <li class="education__specimen-prop">No carboxyl group</li>
+                    <li class="education__specimen-prop">Strong CB1 receptor binding</li>
+                    <li class="education__specimen-prop">Activated through heat</li>
+                </ul>
+                <div class="education__specimen-formula">C<sub>21</sub>H<sub>30</sub>O<sub>2</sub></div>
+            </div>
+        </div>
+
+        <!-- Specification Cards -->
+        <div class="education__specs">
+            <!-- Formulation Card -->
+            <div class="education__spec-card">
+                <div class="education__spec-title">Our Formulation</div>
+                <p class="education__spec-content">Each HaSheesh vape contains a precisely balanced blend—engineered for optimal potency and effect profile.</p>
+                <div class="education__blend">
+                    <div class="education__blend-item">
+                        <div class="education__blend-label">THCa</div>
+                        <div class="education__blend-bar">
+                            <div class="education__blend-fill" style="width: 50%;"></div>
+                        </div>
+                        <div class="education__blend-value">50%</div>
+                    </div>
+                    <div class="education__blend-item">
+                        <div class="education__blend-label">THCP</div>
+                        <div class="education__blend-bar">
+                            <div class="education__blend-fill" style="width: 15%;"></div>
+                        </div>
+                        <div class="education__blend-value">15%</div>
+                    </div>
+                    <div class="education__blend-item">
+                        <div class="education__blend-label">HHC</div>
+                        <div class="education__blend-bar">
+                            <div class="education__blend-fill" style="width: 35%;"></div>
+                        </div>
+                        <div class="education__blend-value">35%</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="education__block">
-                <h3 class="education__block-title">THCa vs. THC</h3>
-                <p class="education__block-text">THCa and THC differ by a single carboxyl group (-COOH). This structural difference is critical to their distinct properties.</p>
-                <p class="education__block-text">Through decarboxylation, this group is removed, increasing bioavailability and receptor binding. This structural change is why THC produces intoxicating effects while THCa does not—until heat is applied.</p>
-                <div class="education__highlight">
-                    <div class="education__highlight-title">Advanced Hardware</div>
-                    <p class="education__highlight-text">Our products utilize <strong>Mesh 2.0</strong> heating technology—designed for consistent, efficient vaporization that preserves terpene profiles and ensures smooth delivery.</p>
-                </div>
+            <!-- Hardware Card -->
+            <div class="education__spec-card">
+                <div class="education__spec-title">Advanced Hardware</div>
+                <p class="education__spec-content" style="margin-bottom: 20px;">Our products utilize Mesh 2.0 heating technology—designed for consistent, efficient vaporization that preserves terpene profiles and ensures smooth delivery.</p>
+                <ul class="education__specimen-props">
+                    <li class="education__specimen-prop">Ceramic Mesh 2.0 heating core</li>
+                    <li class="education__specimen-prop">Optimal temperature control</li>
+                    <li class="education__specimen-prop">Terpene preservation</li>
+                    <li class="education__specimen-prop">Consistent vaporization</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -2405,12 +2789,24 @@
     <div class="why-us__inner">
         <div class="why-us__header">
             <span class="why-us__eyebrow">Our Philosophy</span>
-            <h2 class="why-us__title kinetic-text">Why <em>HaSheesh</em></h2>
+            <h2 class="why-us__title">Why <em>HaSheesh</em></h2>
         </div>
 
         <div style="max-width: 900px; margin: 0 auto 60px; text-align: center; font-size: 1.1rem; line-height: 1.9; opacity: 0.85;">
             <p style="margin-bottom: 20px;">At HaSheesh, we approach hemp the way fine houses approach craftsmanship—with restraint, discipline, and respect for the material itself. Quality is not something we add at the end; it is engineered into every decision from the very beginning.</p>
             <p>We are deliberate about what we use, how it's handled, and—most importantly—what reaches the consumer. Every cultivar, every batch, every process is chosen with a singular priority: integrity of the plant and trust of the customer.</p>
+
+            <p style="margin-top: 30px;">
+                <a href="certification.html" target="_blank" class="certification-link hover-trigger" style="display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.95rem; font-weight: 600; color: var(--gold); text-decoration: none; border-bottom: 2px solid var(--gold); padding-bottom: 2px; transition: all 0.3s ease;">                        <path d="M9 11l3 3L22 4"/>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                    </svg>
+                    <span>Third-Party Certified & Verified</span>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                        <path d="M7 7h10v10"/>
+                        <path d="M7 17L17 7"/>
+                    </svg>
+                </a>
+            </p>
         </div>
 
         <div class="why-us__grid">
@@ -2486,7 +2882,7 @@
     <div class="faq__inner">
         <div class="faq__header">
             <span class="faq__eyebrow">Support</span>
-            <h2 class="faq__title kinetic-text">Frequently Asked<br><em>Questions</em></h2>
+            <h2 class="faq__title">Frequently Asked<br><em>Questions</em></h2>
         </div>
 
         <div class="faq__list">
@@ -2545,7 +2941,7 @@
 
         <div class="faq__contact">
             <p>Still have questions?</p>
-            <a href="mailto:hello@hasheesh.com" class="faq__contact-link hover-trigger">
+            <a href="mailto:info.hasheesh@gmail.com" class="faq__contact-link hover-trigger">
                 <span>Contact Us</span>
                 <svg viewBox="0 0 24 24" width="20" height="20">
                     <path d="M5 12h14M12 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -2559,7 +2955,7 @@
 <section class="contact" id="contact">
     <div class="contact__inner">
         <div class="contact__header">
-            <h2 class="contact__title kinetic-text">Partnership Opportunities</h2>
+            <h2 class="contact__title">Partnership Opportunities</h2>
             <p class="contact__subtitle">Interested in carrying HaSheesh premium products? Let's explore if we're the right fit for each other.</p>
         </div>
 
@@ -2807,10 +3203,11 @@
                 preloader.classList.add('hidden');
                 setTimeout(() => {
                     document.body.classList.remove('loading');
-                    if (lenis) lenis.start();
-                    initKineticText();
+                    document.body.classList.add('animating'); // Keep scroll locked during intro
+                    // Keep lenis stopped - will start after hero intro completes
                     setTimeout(() => {
                         ScrollTrigger.refresh();
+                        initKineticText(); // MOVED HERE - after refresh
                     }, 100);
                     playHeroIntro();
                 }, 800);
@@ -2850,6 +3247,19 @@
                 duration: 0.1
             });
         });
+
+        // Prevent any scrolling during animation period
+        const preventScroll = (e) => {
+            if (document.body.classList.contains('animating')) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+        };
+
+        window.addEventListener('wheel', preventScroll, { passive: false });
+        window.addEventListener('touchmove', preventScroll, { passive: false });
+        window.addEventListener('scroll', preventScroll, { passive: false });
     }
 
     // ============================================
@@ -2924,8 +3334,13 @@
         gsap.set(".pen-hero, .pen-flavor", { xPercent: -50, yPercent: -50 });
 
         if (!isMobile) {
-            gsap.set('.bg-layer', { opacity: 0, y: 80, x: -30 });
-            gsap.set('.fg-layer', { opacity: 0, y: 60, x: 20 });
+            // Individual starting positions for balanced center of mass
+            gsap.set('.pen-bg-1', { opacity: 0, y: -60, x: -50 });  // top left
+            gsap.set('.pen-bg-2', { opacity: 0, y: 60, x: 50 });    // bottom right
+            gsap.set('.pen-bg-3', { opacity: 0, y: -40, x: 0 });    // top center
+
+            gsap.set('.pen-fg-1', { opacity: 0, y: 50, x: -40 });   // bottom left
+            gsap.set('.pen-fg-2', { opacity: 0, y: -50, x: 40 });   // top right
         }
         gsap.set('.pen-hero', { opacity: 0, x: 0, y: 80, rotation: -12 });
         gsap.set('.nav-top', { opacity: 0, y: -20 });
@@ -3011,6 +3426,9 @@
 
         tl.eventCallback("onComplete", () => {
             heroIntroComplete = true;
+            // Now it's safe to enable scrolling
+            document.body.classList.remove('animating');
+            if (lenis) lenis.start();
         });
 
         initHeroScroll();
@@ -3034,112 +3452,192 @@
             }
         });
 
-        // Desktop animations
-        if (!isMobile) {
+        // ============================================
+        // MOBILE vs DESKTOP: Completely separate animations
+        // ============================================
+
+        if (isMobile) {
+            // ============================================
+            // MOBILE ANIMATION - No pen transition, 3 boxes directly
+            // ============================================
+
+            // Fade out big text and grid
+            scrollTl.to(".big-text", { y: -window.innerHeight * 0.8, opacity: 0, ease: "power1.inOut" }, 0)
+                .to(".grid-line", { y: -window.innerHeight * 0.3, opacity: 0.3, ease: "none" }, 0);
+
+            // Hide hero pen immediately on mobile
+            scrollTl.to(".pen-hero", { opacity: 0, duration: 0.01 }, 0.20);
+
+            // Mobile spacing - tighter diagonal
+            const mobileSpacingX = window.innerWidth * 0.18;
+            const mobileSpacingY = window.innerHeight * 0.14;
+
+            // Mobile scale - larger to fill screen (0.45 gives good visibility)
+            const mobileScale = 0.45;
+
+            // Mobile Y offset - push down to avoid nav coverage
+            const mobileYOffset = window.innerHeight * 0.08;
+
+            // Set all 3 flavors at their FINAL splay positions immediately
+            scrollTl.set(".pen-flavor-1", {
+                x: -mobileSpacingX,
+                y: -mobileSpacingY + mobileYOffset,
+                scale: mobileScale,
+                rotation: 0
+            }, 0.25);
+
+            scrollTl.set(".pen-flavor-2", {
+                x: 0,
+                y: mobileYOffset,
+                scale: mobileScale,
+                rotation: 0
+            }, 0.25);
+
+            scrollTl.set(".pen-flavor-3", {
+                x: mobileSpacingX,
+                y: mobileSpacingY + mobileYOffset,
+                scale: mobileScale,
+                rotation: 0
+            }, 0.25);
+
+            // Fade in ALL 3 boxes together
+            scrollTl.to([".pen-flavor-1", ".pen-flavor-2", ".pen-flavor-3"], {
+                opacity: 1,
+                duration: 0.3,
+                ease: "power2.out"
+            }, 0.30);
+
+            // Store positions for any parallax effects
+            flavor1X = -mobileSpacingX;
+            flavor1Y = -mobileSpacingY + mobileYOffset;
+            flavor2X = 0;
+            flavor2Y = mobileYOffset;
+            flavor3X = mobileSpacingX;
+            flavor3Y = mobileSpacingY + mobileYOffset;
+
+            // Mobile label positions
+            const mobileLabelSpacing = (mobileSpacingY / window.innerHeight) * 100;
+            const mobileLabel1Top = 50 - mobileLabelSpacing + 8;  // +8 to account for Y offset
+            const mobileLabelHeroTop = 50 + 8;
+            const mobileLabel3Top = 50 + mobileLabelSpacing + 8;
+
+            // Labels animation - fade in after boxes
+            scrollTl.to(".pen-labels", { opacity: 1, duration: 0.1, ease: "power2.out" }, 0.50)
+                .set(".label-1", { top: mobileLabel1Top + '%' }, 0.50)
+                .set(".label-hero", { top: mobileLabelHeroTop + '%' }, 0.50)
+                .set(".label-3", { top: mobileLabel3Top + '%' }, 0.50)
+                .to(".label-1", { opacity: 1, y: 0, duration: 0.15, ease: "power3.out" }, 0.55)
+                .to(".label-hero", { opacity: 1, y: 0, duration: 0.15, ease: "power3.out" }, 0.60)
+                .to(".label-3", { opacity: 1, y: 0, duration: 0.15, ease: "power3.out" }, 0.65);
+
+        } else {
+            // ============================================
+            // DESKTOP ANIMATION - Full pen transition + splay
+            // ============================================
+
+            // Background/foreground layers
             scrollTl.to(".bg-layer", { y: -window.innerHeight * 2.5, opacity: 0, ease: "power2.in" }, 0)
                 .to(".fg-layer", { y: -window.innerHeight * 3, opacity: 0, ease: "power2.in" }, 0);
-        }
 
-        scrollTl.to(".big-text", { y: -window.innerHeight * 1.5, opacity: 0, ease: "power1.inOut" }, 0)
-            .to(".grid-line", { y: -window.innerHeight * 0.5, ease: "none" }, 0);
+            scrollTl.to(".big-text", { y: -window.innerHeight * 1.5, opacity: 0, ease: "power1.inOut" }, 0)
+                .to(".grid-line", { y: -window.innerHeight * 0.5, ease: "none" }, 0);
 
-        // Pen scale and positioning - adapted for mobile
-        const displayScale = isMobile ? 0.36 : 0.46;
-        const focusYOffset = isMobile ? window.innerHeight * 0.05 : window.innerHeight * 0.06;
-        const heroFocusXOffset = isMobile
-            ? -Math.min(window.innerWidth * 0.08, 78)
-            : -Math.min(window.innerWidth * 0.095, 120);
-        const flavorFocusXOffset = 0;
+            // Desktop scale and positioning
+            const displayScale = 0.45;
+            const focusYOffset = window.innerHeight * 0.06;
+            const heroFocusXOffset = -window.innerWidth * 0.095;
 
-        scrollTl.to({ rotation: -12, scale: 1, y: 0, x: 0 }, {
-            rotation: 0,
-            scale: displayScale,
-            y: focusYOffset,
-            x: heroFocusXOffset,
-            ease: "power2.inOut",
-            onUpdate: function() {
-                heroScrollRotation = this.targets()[0].rotation;
-                heroScrollScale = this.targets()[0].scale;
-                heroScrollY = this.targets()[0].y;
-                heroScrollX = this.targets()[0].x;
-            }
-        }, 0.15)
-            .to(".orb-3", { opacity: 0.35, scale: 1.5, ease: "power2.inOut" }, 0.15)
-            .to(".orb-1, .orb-2", { opacity: 0.05, ease: "power2.inOut" }, 0.15)
-            .to(".grid-line", { y: 0, opacity: 0.3, ease: "power2.inOut" }, 0.15);
-
-        // Transition: fade out hero pen, fade in flavor pen+box images
-        scrollTl.to(".pen-hero", {
-            opacity: 0,
-            ease: "power2.inOut"
-        }, 0.45);
-
-        // Seed flavor pens directly at their target spot (no snap)
-        scrollTl.set([".pen-flavor-1", ".pen-flavor-2", ".pen-flavor-3"], {
-            x: flavorFocusXOffset,
-            y: focusYOffset,
-            scale: displayScale,
-            rotation: () => heroScrollRotation
-        }, 0.45);
-
-        // Fade in center flavor first as hero disappears
-        scrollTl.to(".pen-flavor-2", {
-            opacity: 1,
-            duration: 0.35,
-            ease: "power2.out"
-        }, 0.45);
-
-        // Fade in side flavors a bit later
-        scrollTl.to([".pen-flavor-1", ".pen-flavor-3"], {
-            opacity: 1,
-            duration: 0.25,
-            ease: "power2.out"
-        }, 0.75);
-
-        // Diagonal positioning - adjusted for mobile
-        const penSpacingX = isMobile
-            ? Math.min(window.innerWidth * 0.18, 100)
-            : Math.min(window.innerWidth * 0.18, 220);
-        const penSpacingY = isMobile
-            ? Math.min(window.innerHeight * 0.16, 110)
-            : Math.min(window.innerHeight * 0.18, 160);
-
-        // pen-flavor-1: up and to the left
-        scrollTl.to(".pen-flavor-1", {
-            x: flavorFocusXOffset - penSpacingX,
-            y: focusYOffset - penSpacingY,
-            ease: "power3.out",
-            onUpdate: function() {
-                flavor1X = gsap.getProperty(".pen-flavor-1", "x");
-                flavor1Y = gsap.getProperty(".pen-flavor-1", "y");
-            }
-        }, 0.82)
-            // pen-flavor-2: stays centered
-            .to(".pen-flavor-2", {
-                x: flavorFocusXOffset,
+            // Hero pen transition animation
+            scrollTl.to({ rotation: -12, scale: 1, y: 0, x: 0 }, {
+                rotation: 0,
+                scale: displayScale,
                 y: focusYOffset,
+                x: heroFocusXOffset,
+                ease: "power2.inOut",
+                onUpdate: function() {
+                    heroScrollRotation = this.targets()[0].rotation;
+                    heroScrollScale = this.targets()[0].scale;
+                    heroScrollY = this.targets()[0].y;
+                    heroScrollX = this.targets()[0].x;
+                }
+            }, 0.15)
+                .to(".orb-3", { opacity: 0.35, scale: 1.5, ease: "power2.inOut" }, 0.15)
+                .to(".orb-1, .orb-2", { opacity: 0.05, ease: "power2.inOut" }, 0.15)
+                .to(".grid-line", { y: 0, opacity: 0.3, ease: "power2.inOut" }, 0.15);
+
+            // Fade out hero pen
+            scrollTl.to(".pen-hero", {
+                opacity: 0,
+                ease: "power2.inOut"
+            }, 0.45);
+
+            // Seed flavor pens at center
+            scrollTl.set([".pen-flavor-1", ".pen-flavor-2", ".pen-flavor-3"], {
+                x: 0,
+                y: 0,
+                scale: displayScale,
+                rotation: () => heroScrollRotation
+            }, 0.45);
+
+            // Fade in center flavor first
+            scrollTl.to(".pen-flavor-2", {
+                opacity: 1,
+                duration: 0.35,
+                ease: "power2.out"
+            }, 0.45);
+
+            // Fade in side flavors
+            scrollTl.to([".pen-flavor-1", ".pen-flavor-3"], {
+                opacity: 1,
+                duration: 0.25,
+                ease: "power2.out"
+            }, 0.75);
+
+            // Desktop spacing
+            const penSpacingX = window.innerWidth * 0.20;
+            const penSpacingY = window.innerHeight * 0.18;
+
+            // Splay animation
+            scrollTl.to(".pen-flavor-1", {
+                x: -penSpacingX,
+                y: -penSpacingY,
                 ease: "power3.out",
                 onUpdate: function() {
-                    flavor2X = gsap.getProperty(".pen-flavor-2", "x");
-                    flavor2Y = gsap.getProperty(".pen-flavor-2", "y");
+                    flavor1X = gsap.getProperty(".pen-flavor-1", "x");
+                    flavor1Y = gsap.getProperty(".pen-flavor-1", "y");
                 }
             }, 0.82)
-            // pen-flavor-3: down and to the right
-            .to(".pen-flavor-3", {
-                x: flavorFocusXOffset + penSpacingX,
-                y: focusYOffset + penSpacingY,
-                ease: "power3.out",
-                onUpdate: function() {
-                    flavor3X = gsap.getProperty(".pen-flavor-3", "x");
-                    flavor3Y = gsap.getProperty(".pen-flavor-3", "y");
-                }
-            }, 0.82);
+                .to(".pen-flavor-2", {
+                    x: 0,
+                    y: 0,
+                    ease: "power3.out",
+                    onUpdate: function() {
+                        flavor2X = gsap.getProperty(".pen-flavor-2", "x");
+                        flavor2Y = gsap.getProperty(".pen-flavor-2", "y");
+                    }
+                }, 0.82)
+                .to(".pen-flavor-3", {
+                    x: penSpacingX,
+                    y: penSpacingY,
+                    ease: "power3.out",
+                    onUpdate: function() {
+                        flavor3X = gsap.getProperty(".pen-flavor-3", "x");
+                        flavor3Y = gsap.getProperty(".pen-flavor-3", "y");
+                    }
+                }, 0.82);
 
-        // Labels animation (3 labels)
-        scrollTl.to(".pen-labels", { opacity: 1, duration: 0.12, ease: "power2.out" }, 0.90)
-            .to(".label-1", { opacity: 1, y: 0, duration: 0.18, ease: "power3.out" }, 0.92)
-            .to(".label-hero", { opacity: 1, y: 0, duration: 0.18, ease: "power3.out" }, 0.96)
-            .to(".label-3", { opacity: 1, y: 0, duration: 0.18, ease: "power3.out" }, 1.00);
+            // Desktop label positions
+            const labelSpacingPercent = (penSpacingY / window.innerHeight) * 100;
+            const label1Top = 50 - labelSpacingPercent;
+            const labelHeroTop = 50;
+            const label3Top = 50 + labelSpacingPercent;
+
+            // Labels animation
+            scrollTl.to(".pen-labels", { opacity: 1, duration: 0.12, ease: "power2.out" }, 0.90)
+                .to(".label-1", { opacity: 1, y: 0, top: label1Top + '%', duration: 0.18, ease: "power3.out" }, 0.92)
+                .to(".label-hero", { opacity: 1, y: 0, top: labelHeroTop + '%', duration: 0.18, ease: "power3.out" }, 0.96)
+                .to(".label-3", { opacity: 1, y: 0, top: label3Top + '%', duration: 0.18, ease: "power3.out" }, 1.00);
+        }
 
         // Mouse parallax - desktop only
         if (!isMobile) {
@@ -3326,11 +3824,21 @@
         const textElements = document.querySelectorAll('.kinetic-text');
         textElements.forEach(el => {
             if (el.querySelectorAll('.char').length > 0) return;
+
+            // Check if element has gradient text styling
+            const hasGradient = window.getComputedStyle(el).webkitBackgroundClip === 'text';
+
+            // Skip gradient text - let it display normally without split animation
+            if (hasGradient) {
+                return;
+            }
+
             const split = new SplitType(el, { types: 'chars' });
             gsap.set(split.chars, { y: 100, opacity: 0, rotateX: -90 });
             ScrollTrigger.create({
                 trigger: el,
                 start: 'top 85%',
+                once: true,
                 onEnter: () => {
                     gsap.to(split.chars, {
                         y: 0,
@@ -3406,37 +3914,72 @@
             delay: 0.4
         });
 
-        // Animate content blocks individually
-        document.querySelectorAll('.education__block').forEach((block, index) => {
-            gsap.from(block, {
+        // Animate specimen cards
+        document.querySelectorAll('.education__specimen').forEach((specimen, index) => {
+            gsap.from(specimen, {
                 scrollTrigger: {
-                    trigger: block,
-                    start: 'top 80%',
+                    trigger: '.education__exhibition',
+                    start: 'top 75%',
                     end: 'bottom 20%',
                     toggleActions: 'play reverse play reverse'
                 },
                 opacity: 0,
                 y: 60,
+                scale: 0.95,
                 duration: 1,
                 ease: 'power3.out',
                 delay: index * 0.2
             });
         });
 
-        // Animate highlights within blocks individually
-        document.querySelectorAll('.education__highlight').forEach((highlight, index) => {
-            gsap.from(highlight, {
+        // Animate transformation icon
+        gsap.from('.education__transformation', {
+            scrollTrigger: {
+                trigger: '.education__exhibition',
+                start: 'top 75%',
+                end: 'bottom 20%',
+                toggleActions: 'play reverse play reverse'
+            },
+            opacity: 0,
+            scale: 0,
+            duration: 0.8,
+            ease: 'back.out(1.7)',
+            delay: 0.5
+        });
+
+        // Animate spec cards
+        document.querySelectorAll('.education__spec-card').forEach((card, index) => {
+            gsap.from(card, {
                 scrollTrigger: {
-                    trigger: highlight,
+                    trigger: card,
                     start: 'top 85%',
                     end: 'bottom 20%',
                     toggleActions: 'play reverse play reverse'
                 },
                 opacity: 0,
-                x: -30,
-                duration: 0.8,
+                y: 50,
+                duration: 0.9,
+                ease: 'power3.out',
+                delay: index * 0.15
+            });
+        });
+
+        // Animate blend bars with stagger
+        document.querySelectorAll('.education__blend-item').forEach((item, index) => {
+            const bar = item.querySelector('.education__blend-fill');
+            const targetWidth = bar.style.width;
+
+            gsap.from(bar, {
+                scrollTrigger: {
+                    trigger: item,
+                    start: 'top 90%',
+                    end: 'bottom 20%',
+                    toggleActions: 'play reverse play reverse'
+                },
+                width: '0%',
+                duration: 1.2,
                 ease: 'power2.out',
-                delay: 0.3
+                delay: index * 0.1
             });
         });
     }
@@ -3683,22 +4226,35 @@
 
         if (fabBtn && fabModal) {
             // Open modal
+            // Open modal with smooth animation
             fabBtn.addEventListener('click', () => {
-                fabModal.classList.add('active');
+                fabModal.style.display = 'flex';
+                // Force reflow to ensure display change is applied
+                fabModal.offsetHeight;
+                // Add active class on next frame for smooth transition
+                requestAnimationFrame(() => {
+                    fabModal.classList.add('active');
+                });
                 document.body.style.overflow = 'hidden';
             });
 
-            // Close modal
-            fabClose.addEventListener('click', () => {
+// Close modal function with smooth animation
+            function closeFabModal() {
                 fabModal.classList.remove('active');
-                document.body.style.overflow = '';
-            });
+                // Wait for transition to complete before hiding
+                setTimeout(() => {
+                    fabModal.style.display = 'none';
+                    document.body.style.overflow = '';
+                }, 500); // Matches the longest transition duration
+            }
 
-            // Close on overlay click
+// Close modal
+            fabClose.addEventListener('click', closeFabModal);
+
+// Close on overlay click
             fabModal.addEventListener('click', (e) => {
                 if (e.target === fabModal) {
-                    fabModal.classList.remove('active');
-                    document.body.style.overflow = '';
+                    closeFabModal();
                 }
             });
 
@@ -3804,7 +4360,7 @@
 
             <input type="checkbox" name="botcheck" class="hidden" style="display: none;">
 
-            <button type="submit" class="form-submit">Send Message</button>
+            <button type="submit" class="form-submit hover-trigger">Send Message</button>
 
             <div class="form-message" id="fab-message"></div>
         </form>
