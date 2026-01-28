@@ -331,6 +331,38 @@
             width: 100%;
         }
 
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 10px;
+            pointer-events: auto;
+            z-index: 1001;
+        }
+
+        .hamburger-line {
+            width: 25px;
+            height: 2px;
+            background: var(--text-dark);
+            transition: all 0.3s ease;
+        }
+
+        .hamburger.active .hamburger-line:nth-child(1) {
+            transform: rotate(45deg) translate(7px, 7px);
+        }
+
+        .hamburger.active .hamburger-line:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active .hamburger-line:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
         /* ============================================
            HERO SECTION
            ============================================ */
@@ -355,7 +387,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            display: flex;
+            display: none;
             justify-content: space-between;
             z-index: 0;
             padding: 0 40px;
@@ -364,7 +396,8 @@
         .grid-line {
             width: 1px;
             height: 100%;
-            background: var(--grid-color);
+            background: transparent;
+            opacity: 0;
         }
 
         .atmosphere {
@@ -441,7 +474,7 @@
 
         .big-text {
             position: absolute;
-            width: clamp(550px, 90vw, 2000px);
+            width: clamp(366px, 60vw, 1333px);
             height: auto;
             z-index: 10;
             top: 50%;
@@ -493,8 +526,8 @@
         }
 
         .pen-hero {
-            width: clamp(150px, 10vw, 200px);
-            height: clamp(440px, 55vh, 620px);
+            width: clamp(180px, 12vw, 260px);
+            height: clamp(520px, 65vh, 820px);
             top: 50%;
             left: 50%;
             transform: rotate(-12deg);
@@ -503,8 +536,8 @@
         }
 
         .pen-flavor {
-            width: 70vw;
-            height: 110vh;
+            width: 68vw;
+            height: 118vh;
             position: absolute;
             top: 50%;
             left: 50%;
@@ -552,18 +585,7 @@
         }
 
         .pen-labels {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding-bottom: 0;
-            pointer-events: none;
-            z-index: 25;
-            opacity: 0;
+            display: none !important;
         }
 
         .label-container {
@@ -576,60 +598,7 @@
             padding: 0;
         }
 
-        .pen-label {
-            position: absolute;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            gap: 10px;
-            opacity: 0;
-            transform: translateY(15px);
-        }
-
-        .label-1 {
-            right: 35vw;
-            top: 30%;
-            bottom: auto;
-            left: auto;
-            text-align: left;
-            flex-direction: row;
-        }
-
-        .label-hero {
-            right: 20vw;
-            left: auto;
-            top: 50%;
-            bottom: auto;
-            flex-direction: row;
-            text-align: left;
-        }
-
-        .label-3 {
-            right: 5vw;
-            left: auto;
-            top: 70%;
-            bottom: auto;
-            text-align: left;
-            flex-direction: row;
-        }
-
-        .label-name {
-            font-size: 0.9rem;
-            font-weight: 500;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            color: var(--text-dark);
-            writing-mode: horizontal-tb;
-            text-orientation: initial;
-            text-align: inherit;
-        }
-
-        .label-line {
-            width: 26px;
-            height: 1px;
-            background: var(--text-dark);
-            opacity: 0.30;
-        }
+        .pen-label, .label-name, .label-line { display: none !important; }
 
         /* ============================================
            COLLECTION SECTION
@@ -2132,12 +2101,35 @@
                 padding: 15px;
             }
 
+            /* Show hamburger on mobile */
+            .hamburger {
+                display: flex;
+            }
+
+            /* Mobile menu overlay */
             .nav-links {
-                gap: 15px;
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 280px;
+                height: 100vh;
+                background: rgba(242, 241, 234, 0.98);
+                backdrop-filter: blur(20px);
+                flex-direction: column;
+                gap: 0;
+                padding: 100px 40px 40px;
+                transition: right 0.4s ease;
+                box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-links.active {
+                right: 0;
             }
 
             .nav-item {
-                font-size: 0.7rem;
+                font-size: 1rem;
+                padding: 15px 0;
+                border-bottom: 1px solid rgba(31, 29, 26, 0.1);
             }
 
             /* Hero - Adapted for mobile */
@@ -2146,7 +2138,7 @@
             }
 
             .big-text {
-                width: clamp(350px, 90vw, 850px);
+                width: clamp(234px, 60vw, 567px);
             }
 
             /* Hide background/foreground blur pens on mobile */
@@ -2157,42 +2149,18 @@
 
             /* Scale down hero and flavor pens for mobile */
             .pen-hero {
-                width: clamp(140px, 26vw, 180px);
-                height: clamp(380px, 62vh, 520px);
+                width: clamp(200px, 34vw, 360px);
+                height: clamp(620px, 95vh, 1100px);
             }
 
             .pen-flavor {
-                width: 60vw;
-                height: 100vh;
+                width: 72vw;
+                height: 128vh;
             }
 
-            /* Mobile labels - positioned at bottom center */
+            /* Mobile labels removed */
             .pen-labels {
-                padding-bottom: 0;
-            }
-
-            .label-container {
-                height: 100%;
-            }
-
-            .pen-label {
-                gap: 6px;
-            }
-
-            .label-1 { right: 30vw; left: auto; top: 30%; bottom: auto; flex-direction: row; text-align: left; }
-            .label-hero { right: 17vw; left: auto; top: 50%; bottom: auto; flex-direction: row; text-align: left; }
-            .label-3 { right: 4vw; left: auto; top: 70%; bottom: auto; flex-direction: row; text-align: left; }
-
-            .label-name {
-                font-size: 0.65rem;
-                letter-spacing: 0.12em;
-                writing-mode: horizontal-tb;
-                text-orientation: initial;
-            }
-
-            .label-line {
-                width: 18px;
-                height: 1px;
+                display: none !important;
             }
 
             /* Collection - Mobile adapted with scroll */
@@ -2260,8 +2228,8 @@
 
             .dossier-stage {
                 position: sticky;
-                top: 140px;
-                height: calc(100vh - 160px);
+                top: 200px;
+                height: calc(100vh - 220px);
                 min-height: 500px;
             }
 
@@ -2415,7 +2383,7 @@
             }
 
             .big-text {
-                width: clamp(300px, 92vw, 650px);
+                width: clamp(200px, 62vw, 433px);
             }
 
             .pen-hero {
@@ -2428,18 +2396,22 @@
                 height: 85vh;
             }
 
-            /* Even smaller labels on small phones */
+            /* Mobile labels - even smaller for tiny screens */
+            .pen-labels {
+                display: flex !important;
+            }
+
+            .pen-label {
+                font-size: 0.5rem;
+            }
+
             .label-name {
-                font-size: 0.55rem;
-                letter-spacing: 0.10em;
+                font-size: 0.5rem;
+                letter-spacing: 0.06em;
             }
 
             .label-line {
-                width: 14px;
-            }
-
-            .pen-labels {
-                padding-bottom: 0;
+                height: 10px;
             }
 
             .collection {
@@ -2447,8 +2419,8 @@
             }
 
             .dossier-stage {
-                top: 130px;
-                height: calc(100vh - 150px);
+                top: 180px;
+                height: calc(100vh - 200px);
             }
 
             .nav-list {
@@ -2534,7 +2506,15 @@
 
 <nav class="nav-top" id="mainNav">
     <a href="#hero" class="logo hover-trigger"><img src="images/logo.png" alt="Ha Sheesh Logo"></a>
-    <div class="nav-links">
+
+    <!-- Hamburger Menu Button -->
+    <button class="hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+    </button>
+
+    <div class="nav-links" id="navLinks">
         <a href="#hero" class="nav-item hover-trigger active" data-section="hero">Home</a>
         <a href="#collection" class="nav-item hover-trigger" data-section="collection">Collection</a>
         <a href="#education" class="nav-item hover-trigger" data-section="education">Learn</a>
@@ -2961,7 +2941,7 @@
 
         <form class="contact__form" id="partnership-form" action="https://api.web3forms.com/submit" method="POST">
             <!-- Web3Forms Access Key - Replace with your own -->
-            <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+            <input type="hidden" name="access_key" value="845f276c-dc3c-4cb5-ad52-e6c407d38400">
 
             <!-- Redirect after submission (optional) -->
             <input type="hidden" name="redirect" value="false">
@@ -3291,12 +3271,28 @@
     function initNavigation() {
         const nav = document.getElementById('mainNav');
         const navItems = document.querySelectorAll('.nav-item');
+        const hamburger = document.getElementById('hamburgerBtn');
+        const navLinks = document.getElementById('navLinks');
+
+        // Hamburger menu toggle
+        if (hamburger) {
+            hamburger.addEventListener('click', () => {
+                hamburger.classList.toggle('active');
+                navLinks.classList.toggle('active');
+            });
+        }
 
         navItems.forEach(item => {
             item.addEventListener('click', (e) => {
                 e.preventDefault();
                 const target = item.getAttribute('href');
                 lenis.scrollTo(target, { duration: 2 });
+
+                // Close mobile menu after clicking
+                if (hamburger && navLinks.classList.contains('active')) {
+                    hamburger.classList.remove('active');
+                    navLinks.classList.remove('active');
+                }
             });
         });
 
@@ -3332,6 +3328,7 @@
 
     function initHeroSetup() {
         gsap.set(".pen-hero, .pen-flavor", { xPercent: -50, yPercent: -50 });
+
 
         if (!isMobile) {
             // Individual starting positions for balanced center of mass
@@ -3458,77 +3455,102 @@
 
         if (isMobile) {
             // ============================================
-            // MOBILE ANIMATION - No pen transition, 3 boxes directly
+            // MOBILE ANIMATION - staged reveal -> splay
             // ============================================
+
+            // Base params
+            const mobileScale = 1.8;
+            const mobileYOffset = window.innerHeight * 0.02;
+            const mobileSpacingX = window.innerWidth * 0.26;
+            const mobileSpacingY = window.innerHeight * 0.22;
+
+            // Start hidden/stacked so splay is not visible at load
+            scrollTl.set([".pen-flavor-1", ".pen-flavor-2", ".pen-flavor-3"], {
+                x: 0,
+                y: mobileYOffset,
+                scale: mobileScale,
+                rotation: 0,
+                opacity: 0
+            }, 0);
 
             // Fade out big text and grid
             scrollTl.to(".big-text", { y: -window.innerHeight * 0.8, opacity: 0, ease: "power1.inOut" }, 0)
                 .to(".grid-line", { y: -window.innerHeight * 0.3, opacity: 0.3, ease: "none" }, 0);
 
-            // Hide hero pen immediately on mobile
-            scrollTl.to(".pen-hero", { opacity: 0, duration: 0.01 }, 0.20);
+            // Keep hero pen visible, then smoothly shrink/arc off-screen before splay
+            scrollTl.to(".pen-hero", { opacity: 1, duration: 0.2, ease: "power2.out" }, 0)
+                .to(".pen-hero", {
+                    x: -window.innerWidth * 0.12,
+                    y: -window.innerHeight * 0.22,
+                    scale: 0.82,
+                    rotation: -6,
+                    duration: 0.55,
+                    ease: "power3.inOut"
+                }, 0.25)
+                .to(".pen-hero", {
+                    x: -window.innerWidth * 0.20,
+                    y: -window.innerHeight * 1.3,
+                    scale: 0.65,
+                    opacity: 0,
+                    duration: 0.45,
+                    ease: "power3.in"
+                }, 0.80);
 
-            // Mobile spacing - tighter diagonal
-            const mobileSpacingX = window.innerWidth * 0.18;
-            const mobileSpacingY = window.innerHeight * 0.14;
+            // Reveal all three flavor pens together after some scroll
+            const mobilePreOffsetX = window.innerWidth * 0.06;
+            const mobilePreOffsetY = window.innerHeight * 0.04;
 
-            // Mobile scale - larger to fill screen (0.45 gives good visibility)
-            const mobileScale = 0.45;
-
-            // Mobile Y offset - push down to avoid nav coverage
-            const mobileYOffset = window.innerHeight * 0.08;
-
-            // Set all 3 flavors at their FINAL splay positions immediately
-            scrollTl.set(".pen-flavor-1", {
-                x: -mobileSpacingX,
-                y: -mobileSpacingY + mobileYOffset,
-                scale: mobileScale,
-                rotation: 0
-            }, 0.25);
-
-            scrollTl.set(".pen-flavor-2", {
-                x: 0,
-                y: mobileYOffset,
-                scale: mobileScale,
-                rotation: 0
-            }, 0.25);
-
-            scrollTl.set(".pen-flavor-3", {
-                x: mobileSpacingX,
-                y: mobileSpacingY + mobileYOffset,
-                scale: mobileScale,
-                rotation: 0
-            }, 0.25);
-
-            // Fade in ALL 3 boxes together
             scrollTl.to([".pen-flavor-1", ".pen-flavor-2", ".pen-flavor-3"], {
                 opacity: 1,
-                duration: 0.3,
-                ease: "power2.out"
-            }, 0.30);
+                duration: 0.45,
+                ease: "power2.inOut"
+            }, 0.55)
+            .to(".pen-flavor-1", {
+                x: -mobilePreOffsetX,
+                y: -mobilePreOffsetY + mobileYOffset,
+                duration: 0.45,
+                ease: "power2.inOut"
+            }, 0.55)
+            .to(".pen-flavor-3", {
+                x: mobilePreOffsetX,
+                y: mobilePreOffsetY + mobileYOffset,
+                duration: 0.45,
+                ease: "power2.inOut"
+            }, 0.55);
 
-            // Store positions for any parallax effects
-            flavor1X = -mobileSpacingX;
-            flavor1Y = -mobileSpacingY + mobileYOffset;
-            flavor2X = 0;
-            flavor2Y = mobileYOffset;
-            flavor3X = mobileSpacingX;
-            flavor3Y = mobileSpacingY + mobileYOffset;
-
-            // Mobile label positions
-            const mobileLabelSpacing = (mobileSpacingY / window.innerHeight) * 100;
-            const mobileLabel1Top = 50 - mobileLabelSpacing + 8;  // +8 to account for Y offset
-            const mobileLabelHeroTop = 50 + 8;
-            const mobileLabel3Top = 50 + mobileLabelSpacing + 8;
-
-            // Labels animation - fade in after boxes
-            scrollTl.to(".pen-labels", { opacity: 1, duration: 0.1, ease: "power2.out" }, 0.50)
-                .set(".label-1", { top: mobileLabel1Top + '%' }, 0.50)
-                .set(".label-hero", { top: mobileLabelHeroTop + '%' }, 0.50)
-                .set(".label-3", { top: mobileLabel3Top + '%' }, 0.50)
-                .to(".label-1", { opacity: 1, y: 0, duration: 0.15, ease: "power3.out" }, 0.55)
-                .to(".label-hero", { opacity: 1, y: 0, duration: 0.15, ease: "power3.out" }, 0.60)
-                .to(".label-3", { opacity: 1, y: 0, duration: 0.15, ease: "power3.out" }, 0.65);
+            // Splay later in the scroll
+            scrollTl.to(".pen-flavor-1", {
+                x: -mobileSpacingX,
+                y: -mobileSpacingY + mobileYOffset,
+                duration: 0.60,
+                ease: "power2.inOut",
+                onUpdate: function() {
+                    flavor1X = gsap.getProperty(".pen-flavor-1", "x");
+                    flavor1Y = gsap.getProperty(".pen-flavor-1", "y");
+                }
+            }, 0.95)
+            .to(".pen-flavor-2", {
+                opacity: 1,
+                x: 0,
+                y: mobileYOffset,
+                duration: 0.60,
+                ease: "power2.inOut",
+                onUpdate: function() {
+                    flavor2X = gsap.getProperty(".pen-flavor-2", "x");
+                    flavor2Y = gsap.getProperty(".pen-flavor-2", "y");
+                }
+            }, 0.95)
+            .to(".pen-flavor-3", {
+                opacity: 1,
+                x: mobileSpacingX,
+                y: mobileSpacingY + mobileYOffset,
+                duration: 0.60,
+                ease: "power2.inOut",
+                onUpdate: function() {
+                    flavor3X = gsap.getProperty(".pen-flavor-3", "x");
+                    flavor3Y = gsap.getProperty(".pen-flavor-3", "y");
+                }
+            }, 0.95);
 
         } else {
             // ============================================
@@ -3542,18 +3564,19 @@
             scrollTl.to(".big-text", { y: -window.innerHeight * 1.5, opacity: 0, ease: "power1.inOut" }, 0)
                 .to(".grid-line", { y: -window.innerHeight * 0.5, ease: "none" }, 0);
 
-            // Desktop scale and positioning
-            const displayScale = 0.45;
+            // Desktop scale and positioning (hero slight shrink only; splay scale unchanged)
+            const heroScale = 0.9;
+            const flavorScale = 1;
             const focusYOffset = window.innerHeight * 0.06;
             const heroFocusXOffset = -window.innerWidth * 0.095;
 
             // Hero pen transition animation
             scrollTl.to({ rotation: -12, scale: 1, y: 0, x: 0 }, {
                 rotation: 0,
-                scale: displayScale,
+                scale: heroScale,
                 y: focusYOffset,
                 x: heroFocusXOffset,
-                ease: "power2.inOut",
+                ease: "power3.inOut",
                 onUpdate: function() {
                     heroScrollRotation = this.targets()[0].rotation;
                     heroScrollScale = this.targets()[0].scale;
@@ -3568,30 +3591,31 @@
             // Fade out hero pen
             scrollTl.to(".pen-hero", {
                 opacity: 0,
-                ease: "power2.inOut"
-            }, 0.45);
+                ease: "power3.inOut",
+                duration: 0.35
+            }, 0.30);
 
             // Seed flavor pens at center
             scrollTl.set([".pen-flavor-1", ".pen-flavor-2", ".pen-flavor-3"], {
                 x: 0,
                 y: 0,
-                scale: displayScale,
+                scale: flavorScale,
                 rotation: () => heroScrollRotation
-            }, 0.45);
+            }, 0.32);
 
             // Fade in center flavor first
             scrollTl.to(".pen-flavor-2", {
                 opacity: 1,
                 duration: 0.35,
                 ease: "power2.out"
-            }, 0.45);
+            }, 0.32);
 
             // Fade in side flavors
             scrollTl.to([".pen-flavor-1", ".pen-flavor-3"], {
                 opacity: 1,
                 duration: 0.25,
                 ease: "power2.out"
-            }, 0.75);
+            }, 0.60);
 
             // Desktop spacing
             const penSpacingX = window.innerWidth * 0.20;
@@ -3629,14 +3653,10 @@
             // Desktop label positions
             const labelSpacingPercent = (penSpacingY / window.innerHeight) * 100;
             const label1Top = 50 - labelSpacingPercent;
-            const labelHeroTop = 50;
+            const labelHeroTop = 40;
             const label3Top = 50 + labelSpacingPercent;
 
-            // Labels animation
-            scrollTl.to(".pen-labels", { opacity: 1, duration: 0.12, ease: "power2.out" }, 0.90)
-                .to(".label-1", { opacity: 1, y: 0, top: label1Top + '%', duration: 0.18, ease: "power3.out" }, 0.92)
-                .to(".label-hero", { opacity: 1, y: 0, top: labelHeroTop + '%', duration: 0.18, ease: "power3.out" }, 0.96)
-                .to(".label-3", { opacity: 1, y: 0, top: label3Top + '%', duration: 0.18, ease: "power3.out" }, 1.00);
+            // Labels removed
         }
 
         // Mouse parallax - desktop only
@@ -3786,7 +3806,7 @@
 
         ScrollTrigger.create({
             trigger: ".collection-wrapper",
-            start: "top top",
+            start: "top 70%",
             end: "bottom bottom",
             scrub: true,
             onUpdate: (self) => {
@@ -4003,71 +4023,145 @@
             delay: 0.3
         });
 
-        // Animate cards with stagger
-        gsap.from('.why-us__card', {
-            scrollTrigger: {
-                trigger: '.why-us__grid',
-                start: 'top 75%',
-                end: 'bottom 20%',
-                toggleActions: 'play reverse play reverse'
-            },
-            opacity: 0,
-            y: 80,
-            scale: 0.95,
-            stagger: 0.15,
-            duration: 1.2,
-            ease: 'power3.out',
-            delay: 0.2
-        });
+        if (window.innerWidth <= 950) {
+            // MOBILE: Individual card animations as they scroll into view
+            document.querySelectorAll('.why-us__card').forEach((card, index) => {
+                // Card animation
+                gsap.from(card, {
+                    scrollTrigger: {
+                        trigger: card,
+                        start: 'top 85%',
+                        toggleActions: 'play none none none',
+                        once: false
+                    },
+                    opacity: 0,
+                    y: 60,
+                    scale: 0.95,
+                    duration: 0.8,
+                    ease: 'power3.out'
+                });
 
-        // Animate icons separately for extra flair
-        gsap.from('.why-us__icon', {
-            scrollTrigger: {
-                trigger: '.why-us__grid',
-                start: 'top 70%',
-                end: 'bottom 20%',
-                toggleActions: 'play reverse play reverse'
-            },
-            opacity: 0,
-            scale: 0,
-            rotation: -180,
-            stagger: 0.15,
-            duration: 0.8,
-            ease: 'back.out(1.7)',
-            delay: 0.5
-        });
+                // Icon within card
+                const icon = card.querySelector('.why-us__icon');
+                if (icon) {
+                    gsap.from(icon, {
+                        scrollTrigger: {
+                            trigger: card,
+                            start: 'top 85%',
+                            toggleActions: 'play none none none'
+                        },
+                        opacity: 0,
+                        scale: 0,
+                        rotation: -180,
+                        duration: 0.7,
+                        ease: 'back.out(1.7)',
+                        delay: 0.2
+                    });
+                }
 
-        // Animate badges
-        gsap.from('.why-us__badge', {
-            scrollTrigger: {
-                trigger: '.why-us__grid',
-                start: 'top 65%',
-                end: 'bottom 20%',
-                toggleActions: 'play reverse play reverse'
-            },
-            opacity: 0,
-            scale: 0.8,
-            y: 20,
-            stagger: 0.15,
-            duration: 0.6,
-            ease: 'back.out(1.7)',
-            delay: 1
-        });
+                // Badge within card
+                const badge = card.querySelector('.why-us__badge');
+                if (badge) {
+                    gsap.from(badge, {
+                        scrollTrigger: {
+                            trigger: card,
+                            start: 'top 85%',
+                            toggleActions: 'play none none none'
+                        },
+                        opacity: 0,
+                        scale: 0.8,
+                        y: 20,
+                        duration: 0.5,
+                        ease: 'back.out(1.7)',
+                        delay: 0.4
+                    });
+                }
+            });
 
-        // Animate stats
-        gsap.from('.why-us__stat', {
-            scrollTrigger: {
-                trigger: '.why-us__stats',
-                start: 'top 85%',
-                end: 'bottom 20%',
-                toggleActions: 'play reverse play reverse'
-            },
-            opacity: 0,
-            y: 50,
-            stagger: 0.1,
-            duration: 0.8,
-            ease: 'power3.out'
-        });
+            // Stats - individual on mobile
+            document.querySelectorAll('.why-us__stat').forEach((stat) => {
+                gsap.from(stat, {
+                    scrollTrigger: {
+                        trigger: stat,
+                        start: 'top 90%',
+                        toggleActions: 'play none none none'
+                    },
+                    opacity: 0,
+                    y: 40,
+                    duration: 0.7,
+                    ease: 'power3.out'
+                });
+            });
+
+        } else {
+            // DESKTOP: Staggered group animations
+
+            // Animate cards with stagger
+            gsap.from('.why-us__card', {
+                scrollTrigger: {
+                    trigger: '.why-us__grid',
+                    start: 'top 75%',
+                    end: 'bottom 20%',
+                    toggleActions: 'play reverse play reverse'
+                },
+                opacity: 0,
+                y: 80,
+                scale: 0.95,
+                stagger: 0.15,
+                duration: 1.2,
+                ease: 'power3.out',
+                delay: 0.2
+            });
+
+            // Animate icons separately for extra flair
+            gsap.from('.why-us__icon', {
+                scrollTrigger: {
+                    trigger: '.why-us__grid',
+                    start: 'top 70%',
+                    end: 'bottom 20%',
+                    toggleActions: 'play reverse play reverse'
+                },
+                opacity: 0,
+                scale: 0,
+                rotation: -180,
+                stagger: 0.15,
+                duration: 0.8,
+                ease: 'back.out(1.7)',
+                delay: 0.5
+            });
+
+            // Animate badges
+            gsap.from('.why-us__badge', {
+                scrollTrigger: {
+                    trigger: '.why-us__grid',
+                    start: 'top 65%',
+                    end: 'bottom 20%',
+                    toggleActions: 'play reverse play reverse'
+                },
+                opacity: 0,
+                scale: 0.8,
+                y: 20,
+                stagger: 0.15,
+                duration: 0.6,
+                ease: 'back.out(1.7)',
+                delay: 1
+            });
+
+            // Animate stats
+            gsap.from('.why-us__stat', {
+                scrollTrigger: {
+                    trigger: '.why-us__stats',
+                    start: 'top 85%',
+                    end: 'bottom 20%',
+                    toggleActions: 'play reverse play reverse'
+                },
+                opacity: 0,
+                y: 50,
+                stagger: 0.1,
+                duration: 0.8,
+                ease: 'power3.out'
+            });
+        }
     }
 
     // ============================================
@@ -4338,7 +4432,7 @@
         <p class="fab-modal-subtitle">We're here to help! Send us a message and we'll get back to you as soon as possible.</p>
 
         <form class="fab-form" id="fab-form" action="https://api.web3forms.com/submit" method="POST">
-            <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+            <input type="hidden" name="access_key" value="845f276c-dc3c-4cb5-ad52-e6c407d38400">
             <input type="hidden" name="redirect" value="false">
             <input type="hidden" name="email" value="info.hasheesh@gmail.com">
             <input type="hidden" name="subject" value="New Customer Question from HaSheesh Website">
