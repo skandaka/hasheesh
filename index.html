@@ -3,11 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ha Sheesh | Premium Cannabis Experience</title>
+    <title>Ha Sheesh | Premium Cannabis Vape Pens & THC Products</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Ha Sheesh offers premium cannabis vape pens crafted with exceptional quality. Explore our collection of Blueberry Cookies, Strawberry Runtz, and Pineapple Express strains. Lab-tested, pure, and potent.">
+    <meta name="keywords" content="cannabis, vape pens, THC, premium cannabis, Ha Sheesh, Blueberry Cookies, Strawberry Runtz, Pineapple Express, cannabis vaporizer, dispensary">
+    <meta name="author" content="Ha Sheesh">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://hasheesh.com/">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hasheesh.com/">
+    <meta property="og:title" content="Ha Sheesh | Premium Cannabis Vape Pens">
+    <meta property="og:description" content="Experience premium cannabis vape pens crafted with exceptional quality. Lab-tested, pure, and potent.">
+    <meta property="og:image" content="https://hasheesh.com/images/og-image.png">
+    <meta property="og:site_name" content="Ha Sheesh">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://hasheesh.com/">
+    <meta name="twitter:title" content="Ha Sheesh | Premium Cannabis Vape Pens">
+    <meta name="twitter:description" content="Experience premium cannabis vape pens crafted with exceptional quality. Lab-tested, pure, and potent.">
+    <meta name="twitter:image" content="https://hasheesh.com/images/og-image.png">
+    
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <link rel="shortcut icon" href="favicon/favicon.ico">
+    <meta name="theme-color" content="#F2EFEC">
+    <meta name="msapplication-TileColor" content="#F2EFEC">
 
+    <!-- DNS Prefetch for faster lookups -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://unpkg.com">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600&family=Montserrat:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    
+    <!-- Preload critical hero images -->
+    <link rel="preload" href="images/logo.png" as="image">
+    <link rel="preload" href="images/textlogo.png" as="image" fetchpriority="high">
+    <link rel="preload" href="images/pen.png" as="image">
+    
+    <!-- Fonts - reduced weights for faster loading -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Montserrat:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Ha Sheesh",
+        "url": "https://hasheesh.com",
+        "logo": "https://hasheesh.com/images/logo.png",
+        "description": "Premium cannabis vape pens crafted with exceptional quality. Lab-tested, pure, and potent.",
+        "sameAs": []
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Ha Sheesh",
+        "url": "https://hasheesh.com",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://hasheesh.com/?s={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "Ha Sheesh Premium Vape Pen Collection",
+        "description": "Premium cannabis vape pens available in Blueberry Cookies, Strawberry Runtz, and Pineapple Express strains.",
+        "brand": {
+            "@type": "Brand",
+            "name": "Ha Sheesh"
+        },
+        "offers": {
+            "@type": "AggregateOffer",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock"
+        }
+    }
+    </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
@@ -444,6 +534,21 @@
             animation: float3 20s ease-in-out infinite;
         }
 
+        /* Respect reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            .orb-1, .orb-2, .orb-3 {
+                animation: none;
+            }
+        }
+
+        /* Disable orb animations on mobile for performance */
+        @media (max-width: 950px) {
+            .orb-1, .orb-2, .orb-3 {
+                animation: none;
+                opacity: 0.1;
+            }
+        }
+
         @keyframes float1 {
             0%, 100% { transform: translate(0, 0) scale(1); }
             50% { transform: translate(100px, -50px) scale(1.1); }
@@ -470,6 +575,14 @@
             align-items: center;
             perspective: 1200px;
             will-change: transform;
+            contain: layout style;
+        }
+
+        /* Remove expensive perspective on mobile */
+        @media (max-width: 950px) {
+            .stage {
+                perspective: none;
+            }
         }
 
         .big-text {
@@ -481,6 +594,10 @@
             left: 50%;
             opacity: 0;
             filter: drop-shadow(0 10px 30px rgba(184, 148, 95, 0.3));
+            will-change: transform, opacity;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            transform: translateZ(0);
         }
 
         .pen-item {
@@ -530,9 +647,13 @@
             height: clamp(520px, 65vh, 820px);
             top: 50%;
             left: 50%;
-            transform: rotate(-12deg);
+            transform: rotate(-12deg) translateZ(0);
             z-index: 15;
             filter: drop-shadow(0 30px 50px rgba(0,0,0,0.25));
+            will-change: transform, opacity;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            contain: layout style;
         }
 
         .pen-flavor {
@@ -541,13 +662,17 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            transform: none;
+            transform: translateZ(0);
             z-index: 14;
             filter: drop-shadow(0 20px 40px rgba(0,0,0,0.2));
             opacity: 0;
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
+            will-change: transform, opacity;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            contain: layout style;
         }
 
         .pen-flavor-1 {
@@ -722,7 +847,7 @@
         }
 
         .dossier-stage {
-            height: calc(100vh - 90px);
+            height: calc(100vh - 120px);
             width: 100%;
             display: flex;
             align-items: center;
@@ -730,23 +855,27 @@
             perspective: 1500px;
             position: sticky;
             top: 90px;
+            padding: 20px 40px;
+            box-sizing: border-box;
         }
 
         .dossier-card {
             width: 100%;
             max-width: 1800px;
             height: auto;
-            min-height: 750px;
+            max-height: calc(100vh - 100px);
+            min-height: 720px;
             background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(30px) saturate(120%);
             border: 1px solid rgba(255, 255, 255, 0.8);
             border-radius: 20px;
             display: grid;
-            grid-template-columns: 62% 38%;
+            grid-template-columns: 58% 42%;
             box-shadow: 0 30px 60px -15px rgba(31, 29, 26, 0.1), inset 0 0 0 1px rgba(255,255,255,0.5);
             overflow: hidden;
             transform-style: preserve-3d;
             transition: transform 0.6s cubic-bezier(0.33, 1, 0.68, 1);
+            margin: 0 auto;
         }
 
         .dossier-visual {
@@ -756,15 +885,17 @@
             align-items: center;
             justify-content: center;
             border-right: 1px solid rgba(31, 29, 26, 0.06);
-            padding: 30px;
+            padding: 50px;
+            min-height: auto;
+            overflow: hidden;
         }
 
         .product-img {
             width: 100%;
-            max-width: 2200px;
+            max-width: 2000px;
             height: auto;
             filter: drop-shadow(0 20px 40px rgba(0,0,0,0.2));
-            transform: rotate(-8deg) scale(1.15);
+            transform: rotate(-8deg) scale(1.35);
             opacity: 1;
             transition: opacity 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 1.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
@@ -773,7 +904,8 @@
             padding: clamp(30px, 4vh, 50px);
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
+            overflow-y: auto;
         }
 
         .content-header {
@@ -810,17 +942,17 @@
 
         .product-desc {
             font-family: var(--font-body);
-            font-size: 0.95rem;
-            line-height: 1.8;
+            font-size: 0.9rem;
+            line-height: 1.7;
             color: var(--text-muted);
-            margin-bottom: 3rem;
+            margin-bottom: 1.5rem;
             max-width: 500px;
         }
 
         .specs-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 2.5rem 3rem;
+            gap: 1.5rem 2rem;
         }
 
         .spec-item {
@@ -2093,9 +2225,38 @@
         }
 
         /* ============================================
+           RESPONSIVE - LARGE SCREENS
+           ============================================ */
+        @media (min-width: 1600px) {
+            .dossier-stage {
+                padding: 25px 60px;
+            }
+            
+            .dossier-card {
+                max-width: 1650px;
+            }
+        }
+
+        @media (min-width: 1920px) {
+            .dossier-stage {
+                padding: 30px 100px;
+            }
+            
+            .dossier-card {
+                max-width: 1600px;
+            }
+        }
+
+        /* ============================================
            RESPONSIVE - MOBILE
            ============================================ */
         @media (max-width: 950px) {
+            /* Disable expensive backdrop-filter in hero section for performance */
+            .hero-wrapper .nav-top {
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+            }
+            
             /* Navigation */
             .nav-top {
                 padding: 15px;
@@ -2138,24 +2299,47 @@
             }
 
             .big-text {
-                width: clamp(234px, 60vw, 567px);
+                width: clamp(420px, 110vw, 800px);
             }
 
-            /* Hide background/foreground blur pens on mobile */
-            .pen-bg-1, .pen-bg-2, .pen-bg-3,
+            /* Hide background/foreground blur pens on mobile - keep 2 bg pens for hero */
+            .pen-bg-3,
             .pen-fg-1, .pen-fg-2 {
                 display: none;
             }
 
-            /* Scale down hero and flavor pens for mobile */
+            /* Show 2 background pens on mobile for hero animation */
+            .pen-bg-1, .pen-bg-2 {
+                opacity: 0.4;
+                filter: blur(2px);
+                width: 15vw;
+                height: 30vh;
+            }
+
+            .pen-bg-1 {
+                top: 15%;
+                left: 8%;
+                transform: rotate(-20deg);
+            }
+
+            .pen-bg-2 {
+                top: 20%;
+                right: 8%;
+                left: auto;
+                transform: rotate(25deg);
+            }
+
+            /* Scale down hero and flavor pens for mobile - optimized for GPU */
             .pen-hero {
                 width: clamp(200px, 34vw, 360px);
                 height: clamp(620px, 95vh, 1100px);
+                filter: none; /* Remove expensive drop-shadow on mobile */
             }
 
             .pen-flavor {
-                width: 72vw;
-                height: 128vh;
+                width: 58vw;
+                height: 100vh;
+                filter: none; /* Remove expensive drop-shadow on mobile */
             }
 
             /* Mobile labels removed */
@@ -2238,54 +2422,58 @@
                 flex-direction: column;
                 min-height: auto;
                 max-width: 100%;
-                height: 100%;
+                height: auto;
+                max-height: none;
+                margin: 0 10px;
             }
 
             .dossier-visual {
-                flex: 0 0 35%;
+                flex: 0 0 auto;
                 border-right: none;
                 border-bottom: 1px solid rgba(31,29,26,0.06);
-                padding: 20px;
-                min-height: 200px;
+                padding: 45px 30px;
+                min-height: 350px;
             }
 
             .product-img {
-                max-width: 260px;
-                transform: rotate(-5deg) scale(1.1);
+                max-width: 450px;
+                width: 90%;
+                transform: rotate(-5deg);
+                filter: drop-shadow(0 15px 30px rgba(0,0,0,0.15));
             }
 
             .dossier-content {
                 flex: 1;
-                padding: 20px 15px;
-                overflow-y: auto;
+                padding: 30px 25px;
+                overflow-y: visible;
             }
 
             .content-header {
-                margin-bottom: 1rem;
-                padding-bottom: 1rem;
+                margin-bottom: 1.25rem;
+                padding-bottom: 1.25rem;
             }
 
             .product-title {
-                font-size: 1.8rem;
+                font-size: 2rem;
             }
 
             .product-desc {
-                font-size: 0.85rem;
-                margin-bottom: 1.5rem;
-                line-height: 1.6;
+                font-size: 0.9rem;
+                margin-bottom: 1.75rem;
+                line-height: 1.7;
             }
 
             .specs-grid {
                 grid-template-columns: 1fr 1fr;
-                gap: 1rem;
+                gap: 1.25rem;
             }
 
             .spec-label {
-                font-size: 0.6rem;
+                font-size: 0.65rem;
             }
 
             .spec-value {
-                font-size: 0.9rem;
+                font-size: 0.95rem;
             }
 
             /* Why Us */
@@ -2383,17 +2571,19 @@
             }
 
             .big-text {
-                width: clamp(200px, 62vw, 433px);
+                width: clamp(360px, 105vw, 600px);
             }
 
             .pen-hero {
                 width: 16vw;
                 height: 32vh;
+                filter: none;
             }
 
             .pen-flavor {
-                width: 50vw;
-                height: 85vh;
+                width: 48vw;
+                height: 80vh;
+                filter: none;
             }
 
             /* Mobile labels - even smaller for tiny screens */
@@ -2432,34 +2622,37 @@
             }
 
             .dossier-visual {
-                flex: 0 0 30%;
-                min-height: 160px;
-                padding: 15px;
+                flex: 0 0 auto;
+                min-height: 280px;
+                padding: 35px 20px;
             }
 
             .product-img {
-                max-width: 180px;
+                max-width: 340px;
+                width: 88%;
+                transform: rotate(-5deg);
+                filter: drop-shadow(0 12px 25px rgba(0,0,0,0.12));
             }
 
             .dossier-content {
-                padding: 15px 12px;
+                padding: 25px 18px;
             }
 
             .product-title {
-                font-size: 1.5rem;
+                font-size: 1.7rem;
             }
 
             .product-desc {
-                font-size: 0.8rem;
-                margin-bottom: 1rem;
+                font-size: 0.85rem;
+                margin-bottom: 1.25rem;
             }
 
             .specs-grid {
-                gap: 0.8rem;
+                gap: 1rem;
             }
 
             .spec-value {
-                font-size: 0.85rem;
+                font-size: 0.9rem;
             }
 
             .age-gate-modal {
@@ -2611,7 +2804,7 @@
         <section class="dossier-stage">
             <div class="dossier-card" id="card">
                 <div class="dossier-visual">
-                    <img src="images/blueberrycookies.png" alt="Product" class="product-img" id="d-img">
+                    <img src="images/blueberrycookies.png" alt="Product" class="product-img" id="d-img" loading="lazy" decoding="async">
                 </div>
 
                 <div class="dossier-content">
@@ -3034,7 +3227,7 @@
         <div class="footer__main">
             <div class="footer__brand">
                 <div class="footer__logo">
-                    <img src="images/logo.png" alt="Ha Sheesh Logo">
+                    <img src="images/logo.png" alt="Ha Sheesh Logo" loading="lazy" decoding="async">
                 </div>
             </div>
 
@@ -3086,7 +3279,7 @@
             title: "Blueberry Cookies",
             type: "Hybrid Sativa",
             img: "images/blueberrycookies.png",
-            desc: "A sweet and relaxing blend featuring rich blueberry notes with hints of fresh-baked cookies. Perfect for unwinding after a long day, Blueberry Cookies delivers deep relaxation and a gentle euphoric lift.",
+            desc: "A sweet, relaxing blend featuring rich blueberry notes with hints of fresh-baked cookies. Perfect for unwinding after a long day, delivering deep relaxation and a gentle euphoric lift.",
             thc: "50% THCa | 15% THCP | 35% HHC",
             potency: "90%",
             terps: "Myrcene, Caryophyllene",
@@ -3097,7 +3290,7 @@
             title: "Strawberry Runtz",
             type: "Hybrid Sativa",
             img: "images/strawberryruntz.png",
-            desc: "Experience the authentic Runtz profile with natural strawberry notes. This blend captures the original Runtz flavor—more natural, more true to the classic genetics. A premium blend that delivers smooth effects and genuine strawberry candy terpenes.",
+            desc: "This blend captures the original Runtz flavor—more natural, more true to the classic genetics. A premium feel delivering smooth effects and genuine strawberry candy terpenes.",
             thc: "50% THCa | 15% THCP | 35% HHC",
             potency: "92%",
             terps: "Limonene, Linalool",
@@ -3135,12 +3328,17 @@
         initContactForm();
         initFAB();
 
+        // Debounced resize handler for better performance
+        let resizeTimeout;
         window.addEventListener('resize', () => {
-            const wasMobile = isMobile;
-            isMobile = window.innerWidth <= 950;
-            if (wasMobile !== isMobile) {
-                ScrollTrigger.refresh();
-            }
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                const wasMobile = isMobile;
+                isMobile = window.innerWidth <= 950;
+                if (wasMobile !== isMobile) {
+                    ScrollTrigger.refresh();
+                }
+            }, 150);
         });
     });
 
@@ -3202,11 +3400,15 @@
         history.scrollRestoration = 'manual';
         window.scrollTo(0, 0);
 
+        // Use lighter settings on mobile for better performance
+        const isMobileDevice = window.innerWidth <= 950;
+        
         lenis = new Lenis({
-            duration: 1.5,
+            duration: isMobileDevice ? 1.0 : 1.5,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             direction: 'vertical',
             smooth: true,
+            smoothTouch: false, // Disable smooth scroll on touch devices for better performance
         });
 
         lenis.stop();
@@ -3219,14 +3421,17 @@
 
         gsap.ticker.lagSmoothing(0);
 
-        lenis.on('scroll', ({ velocity }) => {
-            const skewAmount = velocity * 0.05;
-            gsap.to('.kinetic-text', {
-                skewX: -skewAmount * 0.1,
-                overwrite: true,
-                duration: 0.1
+        // Only apply skew effect on desktop for performance
+        if (!isMobileDevice) {
+            lenis.on('scroll', ({ velocity }) => {
+                const skewAmount = velocity * 0.05;
+                gsap.to('.kinetic-text', {
+                    skewX: -skewAmount * 0.1,
+                    overwrite: true,
+                    duration: 0.1
+                });
             });
-        });
+        }
 
         // Prevent any scrolling during animation period
         const preventScroll = (e) => {
@@ -3440,12 +3645,16 @@
         let flavor2X = 0, flavor2Y = 0;
         let flavor3X = 0, flavor3Y = 0;
 
+        // Scrub value - true for direct 1:1 scroll mapping (smoothest for mobile)
+        const scrubValue = isMobile ? true : 1;
+
         const scrollTl = gsap.timeline({
             scrollTrigger: {
                 trigger: ".hero-wrapper",
                 start: "top top",
                 end: "bottom bottom",
-                scrub: 1
+                scrub: scrubValue,
+                invalidateOnRefresh: true
             }
         });
 
@@ -3455,102 +3664,111 @@
 
         if (isMobile) {
             // ============================================
-            // MOBILE ANIMATION - staged reveal -> splay
+            // MOBILE ANIMATION - Ultra smooth with direct scroll mapping
+            // Using scrub: true for 1:1 scroll-to-animation mapping
+            // All animations use 'none' easing for constant velocity
             // ============================================
 
-            // Base params
-            const mobileScale = 1.8;
-            const mobileYOffset = window.innerHeight * 0.02;
-            const mobileSpacingX = window.innerWidth * 0.26;
-            const mobileSpacingY = window.innerHeight * 0.22;
+            const vh = window.innerHeight;
+            const vw = window.innerWidth;
+            
+            // Smaller scale for mobile splay
+            const mobileScale = 1.4;
+            const splayX = vw * 0.20;
+            const splayY = vh * 0.16;
 
-            // Start hidden/stacked so splay is not visible at load
-            scrollTl.set([".pen-flavor-1", ".pen-flavor-2", ".pen-flavor-3"], {
+            // Initialize flavor pens at start of timeline
+            scrollTl.set(['.pen-flavor-1', '.pen-flavor-2', '.pen-flavor-3'], {
+                opacity: 0,
                 x: 0,
-                y: mobileYOffset,
+                y: 0,
                 scale: mobileScale,
-                rotation: 0,
-                opacity: 0
+                force3D: true,
+                immediateRender: true
             }, 0);
 
-            // Fade out big text and grid
-            scrollTl.to(".big-text", { y: -window.innerHeight * 0.8, opacity: 0, ease: "power1.inOut" }, 0)
-                .to(".grid-line", { y: -window.innerHeight * 0.3, opacity: 0.3, ease: "none" }, 0);
+            // ---- SEGMENT 1 (0% - 25%): Text and grid fade ----
+            scrollTl.to('.big-text', {
+                y: -vh * 0.4,
+                opacity: 0,
+                ease: 'none',
+                force3D: true,
+                duration: 0.25
+            }, 0);
+            
+            scrollTl.to('.grid-line', {
+                y: -vh * 0.1,
+                opacity: 0.5,
+                ease: 'none',
+                force3D: true,
+                duration: 0.25
+            }, 0);
 
-            // Keep hero pen visible, then smoothly shrink/arc off-screen before splay
-            scrollTl.to(".pen-hero", { opacity: 1, duration: 0.2, ease: "power2.out" }, 0)
-                .to(".pen-hero", {
-                    x: -window.innerWidth * 0.12,
-                    y: -window.innerHeight * 0.22,
-                    scale: 0.82,
-                    rotation: -6,
-                    duration: 0.55,
-                    ease: "power3.inOut"
-                }, 0.25)
-                .to(".pen-hero", {
-                    x: -window.innerWidth * 0.20,
-                    y: -window.innerHeight * 1.3,
-                    scale: 0.65,
-                    opacity: 0,
-                    duration: 0.45,
-                    ease: "power3.in"
-                }, 0.80);
+            // ---- SEGMENT 2 (0% - 40%): Hero pen flies out ----
+            scrollTl.to('.pen-hero', {
+                x: -vw * 0.15,
+                y: -vh * 0.9,
+                scale: 0.75,
+                rotation: -18,
+                opacity: 0,
+                ease: 'none',
+                force3D: true,
+                duration: 0.40
+            }, 0);
 
-            // Reveal all three flavor pens together after some scroll
-            const mobilePreOffsetX = window.innerWidth * 0.06;
-            const mobilePreOffsetY = window.innerHeight * 0.04;
-
-            scrollTl.to([".pen-flavor-1", ".pen-flavor-2", ".pen-flavor-3"], {
+            // ---- SEGMENT 3 (40% - 50%): Flavor pens fade in ----
+            scrollTl.to(['.pen-flavor-1', '.pen-flavor-2', '.pen-flavor-3'], {
                 opacity: 1,
-                duration: 0.45,
-                ease: "power2.inOut"
-            }, 0.55)
-            .to(".pen-flavor-1", {
-                x: -mobilePreOffsetX,
-                y: -mobilePreOffsetY + mobileYOffset,
-                duration: 0.45,
-                ease: "power2.inOut"
-            }, 0.55)
-            .to(".pen-flavor-3", {
-                x: mobilePreOffsetX,
-                y: mobilePreOffsetY + mobileYOffset,
-                duration: 0.45,
-                ease: "power2.inOut"
-            }, 0.55);
+                ease: 'none',
+                force3D: true,
+                duration: 0.10
+            }, 0.40);
 
-            // Splay later in the scroll
-            scrollTl.to(".pen-flavor-1", {
-                x: -mobileSpacingX,
-                y: -mobileSpacingY + mobileYOffset,
-                duration: 0.60,
-                ease: "power2.inOut",
-                onUpdate: function() {
-                    flavor1X = gsap.getProperty(".pen-flavor-1", "x");
-                    flavor1Y = gsap.getProperty(".pen-flavor-1", "y");
-                }
-            }, 0.95)
-            .to(".pen-flavor-2", {
-                opacity: 1,
+            // ---- SEGMENT 4 (50% - 80%): Splay outward - more sensitive ----
+            scrollTl.to('.pen-flavor-1', {
+                x: -splayX,
+                y: -splayY,
+                ease: 'none',
+                force3D: true,
+                duration: 0.30
+            }, 0.50);
+
+            scrollTl.to('.pen-flavor-2', {
                 x: 0,
-                y: mobileYOffset,
-                duration: 0.60,
-                ease: "power2.inOut",
-                onUpdate: function() {
-                    flavor2X = gsap.getProperty(".pen-flavor-2", "x");
-                    flavor2Y = gsap.getProperty(".pen-flavor-2", "y");
-                }
-            }, 0.95)
-            .to(".pen-flavor-3", {
-                opacity: 1,
-                x: mobileSpacingX,
-                y: mobileSpacingY + mobileYOffset,
-                duration: 0.60,
-                ease: "power2.inOut",
-                onUpdate: function() {
-                    flavor3X = gsap.getProperty(".pen-flavor-3", "x");
-                    flavor3Y = gsap.getProperty(".pen-flavor-3", "y");
-                }
-            }, 0.95);
+                y: 0,
+                ease: 'none',
+                force3D: true,
+                duration: 0.30
+            }, 0.50);
+
+            scrollTl.to('.pen-flavor-3', {
+                x: splayX,
+                y: splayY,
+                ease: 'none',
+                force3D: true,
+                duration: 0.30
+            }, 0.50);
+
+            // ---- SEGMENT 5 (0% - 35%): Background pens fly out with hero ----
+            scrollTl.to('.pen-bg-1', {
+                x: -vw * 0.3,
+                y: -vh * 0.6,
+                opacity: 0,
+                rotation: -40,
+                ease: 'none',
+                force3D: true,
+                duration: 0.35
+            }, 0);
+
+            scrollTl.to('.pen-bg-2', {
+                x: vw * 0.3,
+                y: -vh * 0.5,
+                opacity: 0,
+                rotation: 45,
+                ease: 'none',
+                force3D: true,
+                duration: 0.35
+            }, 0);
 
         } else {
             // ============================================
