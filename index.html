@@ -1472,13 +1472,11 @@
                 height: 92vh;
                 min-height: 92vh;
                 width: 100%;
-                overflow-x: auto;
-                overflow-y: hidden;
+                overflow: hidden;
                 display: flex;
                 align-items: center;
                 padding: 0;
                 padding-bottom: 8vh;
-                -webkit-overflow-scrolling: touch;
             }
 
             .gallery-track {
@@ -1489,7 +1487,6 @@
                 width: max-content;
                 max-width: none;
                 margin: 0;
-                min-width: 100%;
             }
 
             .gallery-intro {
@@ -1579,16 +1576,6 @@
             /* Remove horizontal scroll artifacts */
             .gallery-container::after {
                 display: none;
-            }
-
-            /* Hide scrollbar while keeping scroll functionality */
-            .gallery-container::-webkit-scrollbar {
-                display: none;
-            }
-
-            .gallery-container {
-                -ms-overflow-style: none;
-                scrollbar-width: none;
             }
         }
 
@@ -3963,18 +3950,14 @@
 
         const isMobileDevice = window.innerWidth <= 950;
 
-        // Disable Lenis on mobile to prevent scroll conflicts
-        if (isMobileDevice) {
-            window.lenis = { start: () => {}, stop: () => {}, scrollTo: () => {} }; // Stub for compatibility
-            return;
-        }
-
         lenis = new Lenis({
-            duration: 2.0,
+            duration: isMobileDevice ? 0.8 : 2.0,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             direction: 'vertical',
-            smooth: true,
+            smooth: !isMobileDevice,
             smoothTouch: false,
+            normalizeWheel: true,
+            syncTouch: isMobileDevice,
         });
 
         window.lenis = lenis; // Make accessible globally
@@ -4092,6 +4075,17 @@
                 }
             });
         });
+
+        // Logo click handler - prevent jump to top
+        const logo = document.querySelector('.logo');
+        if (logo) {
+            logo.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (lenis && lenis.scrollTo) {
+                    lenis.scrollTo('#hero', { duration: 2, offset: 0 });
+                }
+            });
+        }
 
         // Navbar background on scroll
         ScrollTrigger.create({
@@ -4392,12 +4386,7 @@
         if (track._horizontalTween) { track._horizontalTween.kill(); }
         if (track._horizontalST) { track._horizontalST.kill(); }
 
-        // Skip ScrollTrigger animations on mobile - use native scroll
-        if (window.innerWidth <= 950) {
-            // Clear any transforms on mobile
-            gsap.set(track, { clearProps: 'all' });
-            return;
-        }
+        const isMobile = window.innerWidth <= 950;
 
         // Calculate scroll distance - simpler, more accurate
         const getScrollDistance = () => {
@@ -4405,7 +4394,6 @@
             const viewportWidth = window.innerWidth;
 
             // Scroll just enough to show the last card with comfortable right padding
-            // Reduced from 0.05 to prevent scrolling too far
             return Math.max(0, trackWidth - viewportWidth - (viewportWidth * 0.02));
         };
 
@@ -4415,16 +4403,18 @@
             return;
         }
 
-        // Horizontal scroll - main animation
+        // Horizontal scroll - main animation with mobile optimizations
         const horizontalScroll = gsap.to(track, {
             x: () => -getScrollDistance(),
             ease: 'none',
             scrollTrigger: {
                 trigger: gallery,
                 start: 'top top',
-                end: () => `+=${getScrollDistance() * 1.2}`,
-                scrub: 0.65,
+                end: () => `+=${getScrollDistance() * (isMobile ? 1.35 : 1.2)}`,
+                scrub: isMobile ? 0.3 : 0.65,
                 fastScrollEnd: true,
+                normalizeScroll: isMobile,
+                ignoreMobileResize: true,
                 onEnter: () => document.body.classList.add('gallery-active'),
                 onLeave: () => document.body.classList.remove('gallery-active'),
                 onEnterBack: () => document.body.classList.add('gallery-active'),
