@@ -1472,11 +1472,13 @@
                 height: 92vh;
                 min-height: 92vh;
                 width: 100%;
-                overflow: hidden;
+                overflow-x: auto;
+                overflow-y: hidden;
                 display: flex;
                 align-items: center;
                 padding: 0;
                 padding-bottom: 8vh;
+                -webkit-overflow-scrolling: touch;
             }
 
             .gallery-track {
@@ -1487,6 +1489,7 @@
                 width: max-content;
                 max-width: none;
                 margin: 0;
+                min-width: 100%;
             }
 
             .gallery-intro {
@@ -1576,6 +1579,16 @@
             /* Remove horizontal scroll artifacts */
             .gallery-container::after {
                 display: none;
+            }
+
+            /* Hide scrollbar while keeping scroll functionality */
+            .gallery-container::-webkit-scrollbar {
+                display: none;
+            }
+
+            .gallery-container {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
             }
         }
 
