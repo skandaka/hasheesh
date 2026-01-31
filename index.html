@@ -3951,13 +3951,15 @@
         const isMobileDevice = window.innerWidth <= 950;
 
         lenis = new Lenis({
-            duration: isMobileDevice ? 0.8 : 2.0,
+            duration: isMobileDevice ? 1.2 : 2.0,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             direction: 'vertical',
-            smooth: !isMobileDevice,
-            smoothTouch: false,
+            smooth: true,
+            smoothTouch: isMobileDevice,
+            touchInertiaMultiplier: isMobileDevice ? 20 : 35,
             normalizeWheel: true,
-            syncTouch: isMobileDevice,
+            syncTouch: false,
+            touchMultiplier: isMobileDevice ? 1.5 : 2,
         });
 
         window.lenis = lenis; // Make accessible globally
@@ -4411,9 +4413,9 @@
                 trigger: gallery,
                 start: 'top top',
                 end: () => `+=${getScrollDistance() * (isMobile ? 1.35 : 1.2)}`,
-                scrub: isMobile ? 0.3 : 0.65,
-                fastScrollEnd: true,
-                normalizeScroll: isMobile,
+                scrub: isMobile ? 0.8 : 0.65,
+                fastScrollEnd: false,
+                normalizeScroll: true,
                 ignoreMobileResize: true,
                 onEnter: () => document.body.classList.add('gallery-active'),
                 onLeave: () => document.body.classList.remove('gallery-active'),
@@ -5025,8 +5027,9 @@
         const productData = {
             'blueberry-cookies': {
                 name: 'Blueberry Cookies',
-                strain: 'Hybrid Sativa',
+                strain: 'Indica',
                 image: 'images/blueberrycookies.webp',
+                certificate: 'images/cert-blueberrycookies.webp',
                 description: 'A sweet, relaxing blend featuring rich blueberry notes with hints of fresh-baked cookies. Perfect for unwinding after a long day, delivering deep relaxation and a gentle euphoric lift.',
                 potency: [
                     { label: 'THCa', value: 50 },
@@ -5039,8 +5042,9 @@
             },
             'strawberry-runtz': {
                 name: 'Strawberry Runtz',
-                strain: 'Hybrid Sativa',
+                strain: 'Hybrid',
                 image: 'images/strawberryruntz.webp',
+                certificate: 'images/cert-strawberryruntz.webp',
                 description: 'This blend captures the original Runtz flavor—more natural, more true to the classic genetics. A premium feel delivering smooth effects and genuine strawberry candy terpenes.',
                 potency: [
                     { label: 'THCa', value: 50 },
@@ -5053,8 +5057,9 @@
             },
             'pineapple-express': {
                 name: 'Pineapple Express',
-                strain: 'Hybrid Sativa',
+                strain: 'Sativa',
                 image: 'images/pineappleexpress.webp',
+                certificate: 'images/cert-pineappleexpress.webp',
                 description: 'The legendary Pineapple Express delivers an energizing experience with tropical pineapple and citrus notes. Perfect for daytime use, it provides uplifting creativity and focused euphoria.',
                 potency: [
                     { label: 'THCa', value: 50 },
@@ -5113,6 +5118,13 @@
             document.getElementById('productDetailStrain').textContent = product.strain;
             document.getElementById('productDetailName').textContent = product.name;
             document.getElementById('productDetailDescription').textContent = product.description;
+
+            // Update certificate link if available
+            const certBadge = document.querySelector('.product-verified-badge');
+            if (certBadge && product.certificate) {
+                certBadge.href = product.certificate;
+                certBadge.target = '_blank';
+            }
 
             // Populate potency analysis
             const potencyDiv = document.getElementById('productDetailPotency');
