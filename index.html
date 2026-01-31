@@ -3345,16 +3345,11 @@
             <div class="product-card product-card--soon hover-trigger">
                 <div class="product-card-inner">
                     <div class="product-image-wrapper">
-                        <svg class="soon-icon" width="80" height="80" viewBox="0 0 80 80" fill="none">
-                            <rect x="20" y="15" width="40" height="50" rx="4" stroke="currentColor" stroke-width="2"/>
-                            <line x1="20" y1="25" x2="60" y2="25" stroke="currentColor" stroke-width="2"/>
-                            <line x1="20" y1="35" x2="60" y2="35" stroke="currentColor" stroke-width="2"/>
-                            <line x1="20" y1="45" x2="60" y2="45" stroke="currentColor" stroke-width="2"/>
-                        </svg>
+                        <img src="images/prerolls-comingsoon.webp" alt="Premium Pre-Rolls" class="product-image" style="opacity: 0.85;">
                     </div>
                     <div class="product-info">
                         <span class="strain-badge strain-badge--soon">Coming Soon</span>
-                        <h3 class="product-name">Premium Blunts</h3>
+                        <h3 class="product-name">Premium Pre-Rolls</h3>
                     </div>
                 </div>
             </div>
@@ -3363,16 +3358,11 @@
             <div class="product-card product-card--soon hover-trigger">
                 <div class="product-card-inner">
                     <div class="product-image-wrapper">
-                        <svg class="soon-icon" width="80" height="80" viewBox="0 0 80 80" fill="none">
-                            <circle cx="40" cy="35" r="15" stroke="currentColor" stroke-width="2"/>
-                            <path d="M30 35 Q40 50 50 35" stroke="currentColor" stroke-width="2" fill="none"/>
-                            <circle cx="35" cy="32" r="2" fill="currentColor"/>
-                            <circle cx="45" cy="32" r="2" fill="currentColor"/>
-                        </svg>
+                        <img src="images/gummies-comingsoon.webp" alt="THCA Gummies" class="product-image" style="opacity: 0.85;">
                     </div>
                     <div class="product-info">
                         <span class="strain-badge strain-badge--soon">Coming Soon</span>
-                        <h3 class="product-name">Artisan Gummies</h3>
+                        <h3 class="product-name">THCA Gummies</h3>
                     </div>
                 </div>
             </div>
@@ -3951,15 +3941,16 @@
         const isMobileDevice = window.innerWidth <= 950;
 
         lenis = new Lenis({
-            duration: isMobileDevice ? 1.2 : 2.0,
+            duration: isMobileDevice ? 1.5 : 2.0,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             direction: 'vertical',
             smooth: true,
             smoothTouch: isMobileDevice,
-            touchInertiaMultiplier: isMobileDevice ? 20 : 35,
+            touchInertiaMultiplier: isMobileDevice ? 15 : 35,
             normalizeWheel: true,
             syncTouch: false,
-            touchMultiplier: isMobileDevice ? 1.5 : 2,
+            touchMultiplier: isMobileDevice ? 0.8 : 2,
+            lerp: isMobileDevice ? 0.15 : 0.1,
         });
 
         window.lenis = lenis; // Make accessible globally
@@ -4413,7 +4404,7 @@
                 trigger: gallery,
                 start: 'top top',
                 end: () => `+=${getScrollDistance() * (isMobile ? 1.35 : 1.2)}`,
-                scrub: isMobile ? 0.8 : 0.65,
+                scrub: isMobile ? 1.2 : 0.65,
                 fastScrollEnd: false,
                 normalizeScroll: true,
                 ignoreMobileResize: true,
