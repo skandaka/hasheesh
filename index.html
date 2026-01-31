@@ -2655,7 +2655,7 @@
 
             /* Navigation - Much more spacious */
             .nav-top {
-                padding: 20px 25px;
+                padding: 12px 25px;
             }
 
             .logo img {
@@ -4371,11 +4371,6 @@
         const gallery = document.querySelector('.horizontal-gallery');
         if (!gallery) return;
 
-        // Skip ScrollTrigger animations on mobile - use native scroll
-        if (window.innerWidth <= 950) {
-            return;
-        }
-
         const container = document.querySelector('.gallery-container');
         const track = document.querySelector('.gallery-track');
         const cards = document.querySelectorAll('.product-card');
@@ -4383,6 +4378,13 @@
         // If this gets re-initialized (e.g., after a resize), clean up prior instances
         if (track._horizontalTween) { track._horizontalTween.kill(); }
         if (track._horizontalST) { track._horizontalST.kill(); }
+
+        // Skip ScrollTrigger animations on mobile - use native scroll
+        if (window.innerWidth <= 950) {
+            // Clear any transforms on mobile
+            gsap.set(track, { clearProps: 'all' });
+            return;
+        }
 
         // Calculate scroll distance - simpler, more accurate
         const getScrollDistance = () => {
@@ -4407,7 +4409,7 @@
             scrollTrigger: {
                 trigger: gallery,
                 start: 'top top',
-                end: () => `+=${getScrollDistance() * (window.innerWidth <= 950 ? 1.35 : 1.2)}`,
+                end: () => `+=${getScrollDistance() * 1.2}`,
                 scrub: 0.65,
                 fastScrollEnd: true,
                 onEnter: () => document.body.classList.add('gallery-active'),
