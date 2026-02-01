@@ -750,29 +750,36 @@
         }
 
         .scroll-indicator-arrow {
-            width: 24px;
-            height: 24px;
+            width: 40px;
+            height: 40px;
             stroke: var(--gold);
-            stroke-width: 2;
+            stroke-width: 2.5;
             fill: none;
+            filter: drop-shadow(0 2px 8px rgba(197, 160, 89, 0.5));
             animation: bounceDown 2s ease-in-out infinite;
         }
 
         .scroll-indicator--hero {
-            bottom: clamp(20px, 5vh, 60px);
+            bottom: clamp(60px, 12vh, 120px);
             left: 50%;
             transform: translateX(-50%);
         }
 
         .scroll-indicator--gallery {
             position: absolute;
-            right: clamp(12px, 3vw, 40px);
+            right: clamp(20px, 4vw, 60px);
             top: 50%;
             transform: translateY(-50%);
             flex-direction: row;
+            background: rgba(242, 239, 236, 0.9);
+            padding: 16px;
+            border-radius: 50%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         }
 
         .scroll-indicator--gallery .scroll-indicator-arrow {
+            width: 32px;
+            height: 32px;
             animation: bounceRight 2s ease-in-out infinite;
         }
 
@@ -781,10 +788,10 @@
                 transform: translateY(0);
             }
             40% {
-                transform: translateY(8px);
+                transform: translateY(10px);
             }
             60% {
-                transform: translateY(4px);
+                transform: translateY(5px);
             }
         }
 
@@ -806,7 +813,11 @@
                 display: none;
             }
             .scroll-indicator--hero {
-                bottom: clamp(15px, 4vh, 40px);
+                bottom: clamp(40px, 8vh, 80px);
+            }
+            .scroll-indicator-arrow {
+                width: 36px;
+                height: 36px;
             }
         }
 
@@ -1391,6 +1402,106 @@
 
         .product-verified-badge:hover svg:last-child {
             transform: translate(2px, -2px);
+        }
+
+        /* Certificate/Lab Results Lightbox */
+        .certificate-lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 100000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .certificate-lightbox.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .certificate-lightbox-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .certificate-lightbox-image {
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .certificate-lightbox-close {
+            position: absolute;
+            top: -50px;
+            right: 0;
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+        }
+
+        .certificate-lightbox-close:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.1);
+        }
+
+        .certificate-lightbox-close::before,
+        .certificate-lightbox-close::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 2px;
+            background: white;
+        }
+
+        .certificate-lightbox-close::before {
+            transform: rotate(45deg);
+        }
+
+        .certificate-lightbox-close::after {
+            transform: rotate(-45deg);
+        }
+
+        .certificate-lightbox-title {
+            color: white;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 20px;
+            opacity: 0.8;
+        }
+
+        @media (max-width: 768px) {
+            .certificate-lightbox-close {
+                top: -45px;
+                right: 50%;
+                transform: translateX(50%);
+            }
+
+            .certificate-lightbox-close:hover {
+                transform: translateX(50%) scale(1.1);
+            }
         }
 
         .product-detail-description {
@@ -5325,8 +5436,7 @@
             // Update certificate link if available
             const certBadge = document.querySelector('.product-verified-badge');
             if (certBadge && product.certificate) {
-                certBadge.href = product.certificate;
-                certBadge.target = '_blank';
+                certBadge.dataset.certificate = product.certificate;
             }
 
             // Populate potency analysis
@@ -5393,6 +5503,55 @@
                 document.body.classList.remove('overlay-open');
             }, 600);
         }
+
+        // Certificate Lightbox functionality
+        const certLightbox = document.getElementById('certificateLightbox');
+        const certLightboxImage = document.getElementById('certificateLightboxImage');
+        const certLightboxClose = document.getElementById('certificateLightboxClose');
+        const certBadge = document.querySelector('.product-verified-badge');
+
+        if (certBadge) {
+            certBadge.addEventListener('click', (e) => {
+                e.preventDefault();
+                const certificateUrl = certBadge.dataset.certificate;
+                if (certificateUrl && certLightbox) {
+                    certLightboxImage.src = certificateUrl;
+                    certLightbox.style.display = 'flex';
+                    requestAnimationFrame(() => {
+                        certLightbox.classList.add('active');
+                    });
+                }
+            });
+        }
+
+        if (certLightboxClose) {
+            certLightboxClose.addEventListener('click', closeCertificateLightbox);
+        }
+
+        if (certLightbox) {
+            certLightbox.addEventListener('click', (e) => {
+                if (e.target === certLightbox) {
+                    closeCertificateLightbox();
+                }
+            });
+        }
+
+        // Close certificate lightbox on ESC
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && certLightbox && certLightbox.classList.contains('active')) {
+                closeCertificateLightbox();
+            }
+        });
+
+        function closeCertificateLightbox() {
+            if (certLightbox) {
+                certLightbox.classList.remove('active');
+                setTimeout(() => {
+                    certLightbox.style.display = 'none';
+                    certLightboxImage.src = '';
+                }, 300);
+            }
+        }
     }
 </script>
 
@@ -5412,17 +5571,17 @@
                     <h2 class="product-detail-name" id="productDetailName"></h2>
 
                     <!-- Verification Badge -->
-                    <a href="certification.html" target="_blank" class="product-verified-badge hover-trigger">
+                    <button type="button" class="product-verified-badge hover-trigger" data-certificate="">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                             <path d="M9 11l3 3L22 4"/>
                             <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
                         </svg>
-                        <span>Lab Verified</span>
+                        <span>View Lab Results</span>
                         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M7 7h10v10"/>
-                            <path d="M7 17L17 7"/>
+                            <path d="M15 3h6v6"/>
+                            <path d="M10 14L21 3"/>
                         </svg>
-                    </a>
+                    </button>
                 </div>
 
                 <p class="product-detail-description" id="productDetailDescription"></p>
@@ -5450,6 +5609,15 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- CERTIFICATE/LAB RESULTS LIGHTBOX -->
+<div class="certificate-lightbox" id="certificateLightbox">
+    <div class="certificate-lightbox-content">
+        <button class="certificate-lightbox-close hover-trigger" id="certificateLightboxClose" aria-label="Close lab results"></button>
+        <img class="certificate-lightbox-image" id="certificateLightboxImage" src="" alt="Lab Results Certificate">
+        <span class="certificate-lightbox-title">Lab Test Certificate</span>
     </div>
 </div>
 
