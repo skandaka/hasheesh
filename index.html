@@ -1041,9 +1041,7 @@
         }
 
 
-        /* Performance: keep the pinned gallery on the GPU */
-        .gallery-container,
-        .gallery-track,
+        /* Performance: keep the product cards on the GPU */
         .product-card {
             will-change: transform;
             transform: translateZ(0);
@@ -3864,7 +3862,18 @@
                     const wasMobile = isMobile;
                     isMobile = currentWidth <= 950;
                     if (wasMobile !== isMobile) {
+                        // Preserve gallery scroll position during refresh
+                        const galleryTrack = document.querySelector('.gallery-track');
+                        const scrollPos = galleryTrack ? galleryTrack.scrollLeft : 0;
+
                         ScrollTrigger.refresh();
+
+                        // Restore gallery scroll position
+                        if (galleryTrack) {
+                            requestAnimationFrame(() => {
+                                galleryTrack.scrollLeft = scrollPos;
+                            });
+                        }
                     }
                     lastWidth = currentWidth;
                 }
@@ -3979,6 +3988,12 @@
         }
 
         const preventScroll = (e) => {
+            // Allow scrolling inside the gallery-track
+            const galleryTrack = document.querySelector('.gallery-track');
+            if (galleryTrack && galleryTrack.contains(e.target)) {
+                return; // Allow gallery horizontal scroll
+            }
+
             if (document.body.classList.contains('animating')) {
                 e.preventDefault();
                 e.stopPropagation();
@@ -4377,41 +4392,22 @@
         const track = document.querySelector('.gallery-track');
         const cards = document.querySelectorAll('.product-card');
 
-        // If this gets re-initialized (e.g., after a resize), clean up prior instances
-        if (track._horizontalTween) { track._horizontalTween.kill(); }
-        if (track._horizontalST) { track._horizontalST.kill(); }
+        // Clear any GSAP transforms once - we're using native horizontal scroll now
+        if (track && !track._scrollInitialized) {
+            gsap.set(track, { clearProps: 'transform' });
+            track._scrollInitialized = true;
+        }
 
-        // Clear any GSAP transforms - we're using native horizontal scroll now
-        gsap.set(track, { clearProps: 'transform' });
+        // Simple fade-in without ScrollTrigger (no scroll position interference)
+        gsap.fromTo('.gallery-intro',
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.2 }
+        );
 
-        // Smooth fade-in for intro content
-        gsap.from('.gallery-intro', {
-            scrollTrigger: {
-                trigger: gallery,
-                start: 'top 60%',
-                toggleActions: 'play none none reverse'
-            },
-            opacity: 0,
-            x: -60,
-            duration: 1,
-            ease: 'power3.out'
-        });
-
-        // Smooth stagger for cards initial load
-        gsap.from(cards, {
-            scrollTrigger: {
-                trigger: gallery,
-                start: 'top 50%',
-                toggleActions: 'play none none reverse'
-            },
-            opacity: 0,
-            y: 60,
-            stagger: 0.12,
-            duration: 1,
-            ease: 'power3.out'
-        });
-
-
+        gsap.fromTo(cards,
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 0.8, stagger: 0.1, ease: 'power2.out', delay: 0.4 }
+        );
     }
 
 
