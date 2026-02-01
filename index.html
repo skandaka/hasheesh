@@ -376,17 +376,6 @@
            NAVIGATION
            ============================================ */
         /* Top filler bar to eliminate gaps on mobile */
-        .nav-filler {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 20px;
-            background: var(--bg-cream);
-            z-index: 999;
-            pointer-events: none;
-        }
-
         .nav-top {
             position: fixed;
             top: 0;
@@ -3258,9 +3247,6 @@
 
 <div class="cursor"></div>
 
-<!-- Top filler bar to eliminate gap on mobile -->
-<div class="nav-filler"></div>
-
 <nav class="nav-top" id="mainNav">
     <a href="#hero" class="logo hover-trigger"><img src="images/logo.webp" alt="Ha Sheesh Logo"></a>
 
@@ -4223,10 +4209,15 @@
                 rotation: -3
             });
         } else {
-            // Mobile: Minimal setup - only opacity, no transforms (performance)
-            gsap.set('.pen-hero', { opacity: 0 });
-            gsap.set('.nav-top', { opacity: 0 });
-            gsap.set('.big-text', { opacity: 0, yPercent: -50, xPercent: -50 });
+            // Mobile: Simplified setup to match simplified intro
+            gsap.set('.pen-hero', { opacity: 0, y: 20 });
+            gsap.set('.nav-top', { opacity: 0, y: -20 });
+            gsap.set('.big-text', {
+                opacity: 0,
+                yPercent: -50,
+                xPercent: -50,
+                scale: 1.05
+            });
         }
     }
 
@@ -4291,10 +4282,20 @@
                     ease: "power2.out"
                 }, "-=0.5");
         } else {
-            // Mobile: Ultra-minimal intro - just fade in (no transforms for performance)
-            tl.to('.nav-top', { opacity: 1, duration: 0.4, ease: "power1.out" })
-                .to('.big-text', { opacity: 1, duration: 0.5, ease: "power1.out" }, "-=0.2")
-                .to('.pen-hero', { opacity: 1, duration: 0.5, ease: "power1.out" }, "-=0.3");
+            // Mobile: Simplified intro - fewer elements, faster, simpler easing
+            tl.to('.nav-top', { opacity: 1, y: 0, duration: 0.5, ease: "power1.out" })
+                .to('.big-text', {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 0.7,
+                    ease: "power2.out"
+                }, "-=0.3")
+                .to('.pen-hero', {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.6,
+                    ease: "power1.out"
+                }, "-=0.4");
         }
 
         tl.eventCallback("onComplete", () => {
@@ -4307,24 +4308,20 @@
     }
 
     function initHeroScroll() {
-        // Mobile: Skip all hero scroll animations for performance
-        if (isMobile) {
-            // Static hero on mobile - just let it scroll naturally with the page
-            return;
-        }
-
-        // Desktop only: Parallax scroll animations
         let heroScrollRotation = -12;
         let heroScrollScale = 1;
         let heroScrollY = 0;
         let heroScrollX = 0;
+
+        // Mobile: lighter scrub for better performance, Desktop: smooth scrub
+        const scrubValue = isMobile ? 2 : 1;
 
         const scrollTl = gsap.timeline({
             scrollTrigger: {
                 trigger: ".hero-wrapper",
                 start: "top top",
                 end: "bottom bottom",
-                scrub: 1,
+                scrub: scrubValue,
                 invalidateOnRefresh: true
             }
         });
@@ -4390,6 +4387,27 @@
                 heroScrollRotation = gsap.getProperty('.pen-hero', 'rotation');
             }
         }, 0);
+
+        // MOBILE: Simplified but still animated for visual appeal
+        if (isMobile) {
+            // Override desktop animations with simpler mobile versions
+            scrollTl.clear(); // Clear desktop timeline
+
+            // Mobile: Only animate essential elements with simpler movements
+            scrollTl.to(".big-text", {
+                y: -window.innerHeight * 0.9,
+                opacity: 0,
+                ease: 'none',
+                force3D: true
+            }, 0);
+
+            scrollTl.to('.pen-hero', {
+                y: -window.innerHeight * 0.5,
+                scale: 0.95,
+                ease: 'none',
+                force3D: true
+            }, 0);
+        }
 
         // Mouse parallax - desktop only (preserved from original)
         if (!isMobile) {
