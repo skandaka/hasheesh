@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ha Sheesh - Third-Party Certification</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+    <title>Ha Sheesh - Lab Results & Certifications</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -40,11 +40,46 @@
             text-align: center;
         }
 
-        p {
+        .subtitle {
             text-align: center;
             color: #66625C;
             margin-bottom: 30px;
             font-size: 1.1rem;
+        }
+
+        .product-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: 2px solid #C5A059;
+            background: transparent;
+            color: #C5A059;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            background: rgba(197, 160, 89, 0.1);
+        }
+
+        .tab-btn.active {
+            background: #C5A059;
+            color: white;
+        }
+
+        .cert-container {
+            position: relative;
+            min-height: 400px;
         }
 
         .cert-image {
@@ -52,6 +87,32 @@
             height: auto;
             border-radius: 10px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .cert-image.active {
+            display: block;
+        }
+
+        .product-label {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1rem;
+            color: #111;
+            font-weight: 500;
+        }
+
+        .strain-type {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(197, 160, 89, 0.15);
+            color: #8C6D2E;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-left: 10px;
         }
 
         .back-link {
@@ -76,18 +137,77 @@
         .button-container {
             text-align: center;
         }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .tab-btn {
+                padding: 10px 18px;
+                font-size: 0.8rem;
+            }
+
+            .container {
+                padding: 25px 20px;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>Third-Party Certification</h1>
-    <p>Ha Sheesh - Premium Cannabis Products</p>
+    <h1>Lab Results & Certifications</h1>
+    <p class="subtitle">Third-Party Tested for Quality & Purity</p>
 
-    <img src="images/certification.webp" alt="Ha Sheesh Third-Party Certification" class="cert-image">
+    <div class="product-tabs">
+        <button class="tab-btn active" data-product="strawberry">Strawberry Runtz</button>
+        <button class="tab-btn" data-product="blueberry">Blueberry Cookies</button>
+        <button class="tab-btn" data-product="pineapple">Pineapple Express</button>
+    </div>
+
+    <div class="cert-container">
+        <img src="images/certificate.webp" alt="Strawberry Runtz Lab Certificate" class="cert-image active" id="cert-strawberry">
+        <img src="images/certificateblueberry.webp" alt="Blueberry Cookies Lab Certificate" class="cert-image" id="cert-blueberry">
+        <img src="images/certificatepineapple.webp" alt="Pineapple Express Lab Certificate" class="cert-image" id="cert-pineapple">
+    </div>
+
+    <p class="product-label" id="product-label">
+        Strawberry Runtz <span class="strain-type">Hybrid</span>
+    </p>
 
     <div class="button-container">
         <a href="javascript:window.close()" class="back-link">Close Window</a>
     </div>
 </div>
+
+<script>
+    const tabs = document.querySelectorAll('.tab-btn');
+    const certs = document.querySelectorAll('.cert-image');
+    const label = document.getElementById('product-label');
+
+    const productInfo = {
+        strawberry: { name: 'Strawberry Runtz', type: 'Hybrid' },
+        blueberry: { name: 'Blueberry Cookies', type: 'Indica' },
+        pineapple: { name: 'Pineapple Express', type: 'Sativa' }
+    };
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const product = tab.dataset.product;
+
+            // Update active tab
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            // Update active certificate
+            certs.forEach(c => c.classList.remove('active'));
+            document.getElementById('cert-' + product).classList.add('active');
+
+            // Update label
+            const info = productInfo[product];
+            label.innerHTML = `${info.name} <span class="strain-type">${info.type}</span>`;
+        });
+    });
+</script>
 </body>
 </html>
