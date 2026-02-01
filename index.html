@@ -621,6 +621,21 @@
             .pen-container, .big-text, .pen-hero {
                 will-change: auto;
             }
+            /* Force GPU compositing for smoother animations on mobile */
+            .big-text, .pen-hero, .pen-bg-1, .pen-bg-2 {
+                transform: translateZ(0);
+                -webkit-transform: translateZ(0);
+                -webkit-backface-visibility: hidden;
+                backface-visibility: hidden;
+            }
+            /* Reduce filter complexity on mobile for better performance */
+            .big-text {
+                filter: none;
+            }
+            .orb {
+                filter: blur(60px);
+                opacity: 0.1;
+            }
         }
 
         .big-text {
@@ -716,6 +731,86 @@
         }
 
         /* ============================================
+           SCROLL INDICATORS
+           ============================================ */
+        .scroll-indicator {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            pointer-events: none;
+        }
+
+        .scroll-indicator.visible {
+            opacity: 1;
+        }
+
+        .scroll-indicator-arrow {
+            width: 24px;
+            height: 24px;
+            stroke: var(--gold);
+            stroke-width: 2;
+            fill: none;
+            animation: bounceDown 2s ease-in-out infinite;
+        }
+
+        .scroll-indicator--hero {
+            bottom: clamp(20px, 5vh, 60px);
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .scroll-indicator--gallery {
+            position: absolute;
+            right: clamp(12px, 3vw, 40px);
+            top: 50%;
+            transform: translateY(-50%);
+            flex-direction: row;
+        }
+
+        .scroll-indicator--gallery .scroll-indicator-arrow {
+            animation: bounceRight 2s ease-in-out infinite;
+        }
+
+        @keyframes bounceDown {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(8px);
+            }
+            60% {
+                transform: translateY(4px);
+            }
+        }
+
+        @keyframes bounceRight {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateX(0);
+            }
+            40% {
+                transform: translateX(8px);
+            }
+            60% {
+                transform: translateX(4px);
+            }
+        }
+
+        /* Hide gallery scroll indicator on mobile (vertical stack) */
+        @media (max-width: 950px) {
+            .scroll-indicator--gallery {
+                display: none;
+            }
+            .scroll-indicator--hero {
+                bottom: clamp(15px, 4vh, 40px);
+            }
+        }
+
+        /* ============================================
            HORIZONTAL SCROLL GALLERY
            ============================================ */
         .horizontal-gallery {
@@ -782,7 +877,7 @@
                 height: 205%;
                 opacity: 0.45;
                 filter: blur(4px);
-                transform: translate3d(-50%, -20%, 0);
+                transform: translate3d(-50%, -80%, 0);
             }
 
             .product-image {
@@ -904,7 +999,7 @@
             z-index: 0;
             opacity: 0.62;
             /* Keep paint cheap: transforms only */
-            transform: translate3d(-50%, -20%, 0);
+            transform: translate3d(-50%, -80%, 0);
             filter: blur(3px);
         }
 
@@ -930,7 +1025,7 @@
             .flavor-frame {
                 opacity: 0.50;
                 filter: blur(5px);
-                transform: translate3d(-50%, -20%, 0);
+                transform: translate3d(-50%, -80%, 0);
             }
         }
 
@@ -3294,12 +3389,26 @@
             <div class="pen-item pen-fg-1 fg-layer"></div>
             <div class="pen-item pen-fg-2 fg-layer"></div>
         </div>
+
+        <!-- Scroll Down Indicator -->
+        <div class="scroll-indicator scroll-indicator--hero" id="heroScrollIndicator">
+            <svg class="scroll-indicator-arrow" viewBox="0 0 24 24">
+                <path d="M12 5v14M5 12l7 7 7-7"/>
+            </svg>
+        </div>
     </div>
 </section>
 
 <!-- HORIZONTAL SCROLL GALLERY -->
 <section class="horizontal-gallery" id="collection" data-gallery="true">
     <div class="gallery-container">
+        <!-- Scroll Right Indicator -->
+        <div class="scroll-indicator scroll-indicator--gallery" id="galleryScrollIndicator">
+            <svg class="scroll-indicator-arrow" viewBox="0 0 24 24">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+        </div>
+
         <!-- Intro Text -->
         <div class="gallery-intro">
             <span class="gallery-eyebrow">Signature Line</span>
@@ -4083,6 +4192,27 @@
             });
         }
 
+        // Helper function to scroll - works with or without Lenis
+        function scrollToSection(selector, offset = 0) {
+            const isMobileDevice = window.innerWidth <= 950;
+
+            if (lenis && !isMobileDevice) {
+                // Desktop with Lenis
+                lenis.scrollTo(selector, { duration: 2, offset: offset });
+            } else {
+                // Mobile or fallback - use native smooth scroll
+                const element = document.querySelector(selector);
+                if (element) {
+                    const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
+                    const offsetPosition = elementPosition + offset;
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            }
+        }
+
         // Click handlers with proper scroll positions
         navItems.forEach(item => {
             item.addEventListener('click', (e) => {
@@ -4099,27 +4229,27 @@
                 // Scroll to proper positions with device-specific offsets
                 switch(section) {
                     case 'hero':
-                        lenis.scrollTo('#hero', { duration: 2, offset: 0 });
+                        scrollToSection('#hero', 0);
                         break;
                     case 'collection':
                         // Mobile uses vertical stack, desktop uses horizontal scroll
                         const collectionOffset = isMobileDevice ? -80 : 0;
-                        lenis.scrollTo('#collection', { duration: 2, offset: collectionOffset });
+                        scrollToSection('#collection', collectionOffset);
                         break;
                     case 'education':
-                        lenis.scrollTo('#education', { duration: 2, offset: -100 });
+                        scrollToSection('#education', -100);
                         break;
                     case 'why-us':
-                        lenis.scrollTo('#why-us', { duration: 2, offset: -100 });
+                        scrollToSection('#why-us', -100);
                         break;
                     case 'contact':
-                        lenis.scrollTo('#contact', { duration: 2, offset: -100 });
+                        scrollToSection('#contact', -100);
                         break;
                     case 'faq':
-                        lenis.scrollTo('#faq', { duration: 2, offset: -100 });
+                        scrollToSection('#faq', -100);
                         break;
                     default:
-                        lenis.scrollTo(`#${section}`, { duration: 2 });
+                        scrollToSection(`#${section}`, 0);
                 }
             });
         });
@@ -4129,9 +4259,7 @@
         if (logo) {
             logo.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (lenis && lenis.scrollTo) {
-                    lenis.scrollTo('#hero', { duration: 2, offset: 0 });
-                }
+                scrollToSection('#hero', 0);
             });
         }
 
@@ -4209,14 +4337,15 @@
                 rotation: -3
             });
         } else {
-            // Mobile: Simplified setup to match simplified intro
-            gsap.set('.pen-hero', { opacity: 0, y: 20 });
-            gsap.set('.nav-top', { opacity: 0, y: -20 });
+            // Mobile: Simplified setup to match simplified intro, force GPU
+            gsap.set('.pen-hero', { opacity: 0, y: 20, force3D: true });
+            gsap.set('.nav-top', { opacity: 0, y: -20, force3D: true });
             gsap.set('.big-text', {
                 opacity: 0,
                 yPercent: -50,
                 xPercent: -50,
-                scale: 1.05
+                scale: 1.05,
+                force3D: true
             });
         }
     }
@@ -4282,29 +4411,38 @@
                     ease: "power2.out"
                 }, "-=0.5");
         } else {
-            // Mobile: Simplified intro - fewer elements, faster, simpler easing
-            tl.to('.nav-top', { opacity: 1, y: 0, duration: 0.5, ease: "power1.out" })
+            // Mobile: Simplified intro - fewer elements, faster, simpler easing, GPU accelerated
+            tl.to('.nav-top', { opacity: 1, y: 0, duration: 0.4, ease: "power1.out", force3D: true })
                 .to('.big-text', {
                     opacity: 1,
                     scale: 1,
-                    duration: 0.7,
-                    ease: "power2.out"
-                }, "-=0.3")
+                    duration: 0.5,
+                    ease: "power1.out",
+                    force3D: true
+                }, "-=0.2")
                 .to('.pen-hero', {
                     opacity: 1,
                     y: 0,
-                    duration: 0.6,
-                    ease: "power1.out"
-                }, "-=0.4");
+                    duration: 0.4,
+                    ease: "power1.out",
+                    force3D: true
+                }, "-=0.3");
         }
 
         tl.eventCallback("onComplete", () => {
             heroIntroComplete = true;
             document.body.classList.remove('animating');
             if (lenis) lenis.start();
+
+            // Show hero scroll indicator after intro completes
+            const heroIndicator = document.getElementById('heroScrollIndicator');
+            if (heroIndicator) {
+                heroIndicator.classList.add('visible');
+            }
         });
 
         initHeroScroll();
+        initScrollIndicators();
     }
 
     function initHeroScroll() {
@@ -4446,6 +4584,48 @@
     }
 
     // ============================================
+    // SCROLL INDICATORS
+    // ============================================
+    function initScrollIndicators() {
+        const heroIndicator = document.getElementById('heroScrollIndicator');
+        const galleryIndicator = document.getElementById('galleryScrollIndicator');
+        const galleryTrack = document.querySelector('.gallery-track');
+
+        // Hero scroll indicator - hide when user scrolls past threshold
+        if (heroIndicator) {
+            ScrollTrigger.create({
+                trigger: '.hero-wrapper',
+                start: 'top top',
+                end: '30% top',
+                onLeave: () => heroIndicator.classList.remove('visible'),
+                onEnterBack: () => {
+                    if (heroIntroComplete) heroIndicator.classList.add('visible');
+                }
+            });
+        }
+
+        // Gallery scroll indicator - show when gallery enters view, hide when scrolled right
+        if (galleryIndicator && galleryTrack) {
+            // Show indicator when gallery comes into view
+            ScrollTrigger.create({
+                trigger: '.horizontal-gallery',
+                start: 'top 80%',
+                onEnter: () => galleryIndicator.classList.add('visible'),
+                onLeaveBack: () => galleryIndicator.classList.remove('visible')
+            });
+
+            // Hide indicator when user scrolls horizontally in the gallery
+            galleryTrack.addEventListener('scroll', () => {
+                if (galleryTrack.scrollLeft > 50) {
+                    galleryIndicator.classList.remove('visible');
+                } else {
+                    galleryIndicator.classList.add('visible');
+                }
+            }, { passive: true });
+        }
+    }
+
+    // ============================================
     // HORIZONTAL SCROLL GALLERY
     // ============================================
     function initHorizontalGallery() {
@@ -4494,7 +4674,7 @@
 
             gsap.set(img, {
                 xPercent: -50,
-                yPercent: -50,
+                yPercent: -56,
                 x: 0,
                 y: 0,
                 rotation: 0,
