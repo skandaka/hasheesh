@@ -744,7 +744,7 @@
                 height: 205%;
                 opacity: 0.45;
                 filter: blur(4px);
-                transform: translate3d(-50%, -78%, 0);
+                transform: translate3d(-50%, -20%, 0);
             }
 
             .product-image {
@@ -869,7 +869,7 @@
             opacity: 0.62;
             /* Keep paint cheap: transforms only */
             will-change: transform;
-            transform: translate3d(-50%, -62%, 0);
+            transform: translate3d(-50%, -20%, 0);
             filter: blur(3px);
         }
 
@@ -895,7 +895,7 @@
             .flavor-frame {
                 opacity: 0.50;
                 filter: blur(5px);
-                transform: translate3d(-50%, -78%, 0);
+                transform: translate3d(-50%, -20%, 0);
             }
         }
 
@@ -3279,7 +3279,7 @@
                             <img src="images/blueberrycookies.webp" alt="Blueberry Cookies" class="product-image" loading="lazy">
                         </div>
                         <div class="product-info">
-                            <span class="strain-badge">Hybrid Sativa</span>
+                            <span class="strain-badge">Indica</span>
                             <h3 class="product-name">Blueberry Cookies</h3>
                             <span class="view-details">
                             <span>View Details</span>
@@ -3303,7 +3303,7 @@
                             <img src="images/strawberryruntz.webp" alt="Strawberry Runtz" class="product-image" loading="lazy">
                         </div>
                         <div class="product-info">
-                            <span class="strain-badge">Hybrid Sativa</span>
+                            <span class="strain-badge">Hybrid</span>
                             <h3 class="product-name">Strawberry Runtz</h3>
                             <span class="view-details">
                             <span>View Details</span>
@@ -3327,7 +3327,7 @@
                             <img src="images/pineappleexpress.webp" alt="Pineapple Express" class="product-image" loading="lazy">
                         </div>
                         <div class="product-info">
-                            <span class="strain-badge">Hybrid Sativa</span>
+                            <span class="strain-badge">Sativa</span>
                             <h3 class="product-name">Pineapple Express</h3>
                             <span class="view-details">
                             <span>View Details</span>
@@ -3949,7 +3949,7 @@
             touchInertiaMultiplier: isMobileDevice ? 15 : 35,
             normalizeWheel: true,
             syncTouch: false,
-            touchMultiplier: isMobileDevice ? 0.8 : 2,
+            touchMultiplier: isMobileDevice ? 2.5 : 2,
             lerp: isMobileDevice ? 0.15 : 0.1,
         });
 
@@ -5020,7 +5020,7 @@
                 name: 'Blueberry Cookies',
                 strain: 'Indica',
                 image: 'images/blueberrycookies.webp',
-                certificate: 'images/cert-blueberrycookies.webp',
+                certificate: 'images/certificateblueberry.webp',
                 description: 'A sweet, relaxing blend featuring rich blueberry notes with hints of fresh-baked cookies. Perfect for unwinding after a long day, delivering deep relaxation and a gentle euphoric lift.',
                 potency: [
                     { label: 'THCa', value: 50 },
@@ -5035,7 +5035,7 @@
                 name: 'Strawberry Runtz',
                 strain: 'Hybrid',
                 image: 'images/strawberryruntz.webp',
-                certificate: 'images/cert-strawberryruntz.webp',
+                certificate: 'images/certificate.webp',
                 description: 'This blend captures the original Runtz flavor—more natural, more true to the classic genetics. A premium feel delivering smooth effects and genuine strawberry candy terpenes.',
                 potency: [
                     { label: 'THCa', value: 50 },
@@ -5050,7 +5050,7 @@
                 name: 'Pineapple Express',
                 strain: 'Sativa',
                 image: 'images/pineappleexpress.webp',
-                certificate: 'images/cert-pineappleexpress.webp',
+                certificate: 'images/certificatepineapple.webp',
                 description: 'The legendary Pineapple Express delivers an energizing experience with tropical pineapple and citrus notes. Perfect for daytime use, it provides uplifting creativity and focused euphoria.',
                 potency: [
                     { label: 'THCa', value: 50 },
