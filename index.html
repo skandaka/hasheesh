@@ -531,6 +531,13 @@
             opacity: 0;
         }
 
+        /* Hide grid lines on mobile for performance */
+        @media (max-width: 950px) {
+            .grid-line {
+                display: none;
+            }
+        }
+
         .atmosphere {
             position: absolute;
             inset: 0;
@@ -620,6 +627,10 @@
         @media (max-width: 950px) {
             .stage {
                 perspective: none;
+            }
+            /* Remove will-change on mobile since hero is static (no scroll animations) */
+            .pen-container, .big-text, .pen-hero {
+                will-change: auto;
             }
         }
 
@@ -3956,7 +3967,7 @@
             // Ensure we're at top before starting animations
             window.scrollTo(0, 0);
             const isMobileDevice = window.innerWidth <= 950;
-            const preloaderDelay = isMobileDevice ? 1000 : 800; // Slightly longer on mobile
+            const preloaderDelay = isMobileDevice ? 1500 : 800; // Much longer on mobile for performance
 
             setTimeout(() => {
                 preloader.classList.add('hidden');
@@ -3964,7 +3975,9 @@
                     document.body.classList.remove('loading');
                     document.body.classList.add('animating');
                     setTimeout(() => {
-                        ScrollTrigger.refresh();
+                        if (!isMobileDevice) {
+                            ScrollTrigger.refresh(); // Desktop only
+                        }
                         initKineticText();
                     }, 100);
                     playHeroIntro();
@@ -4189,53 +4202,58 @@
         gsap.set(".pen-hero, .pen-flavor", { xPercent: -50, yPercent: -50 });
 
         if (!isMobile) {
+            // Desktop: Full setup with transforms
             gsap.set('.pen-bg-1', { opacity: 0, y: -60, x: -50 });
             gsap.set('.pen-bg-2', { opacity: 0, y: 60, x: 50 });
             gsap.set('.pen-bg-3', { opacity: 0, y: -40, x: 0 });
-
             gsap.set('.pen-fg-1', { opacity: 0, y: 50, x: -40 });
             gsap.set('.pen-fg-2', { opacity: 0, y: -50, x: 40 });
-        }
-        gsap.set('.pen-hero', { opacity: 0, x: 0, y: 0, rotation: -12 });
-        gsap.set('.nav-top', { opacity: 0, y: -20 });
-        gsap.set('.grid-line', { scaleY: 0, transformOrigin: 'top' });
+            gsap.set('.pen-hero', { opacity: 0, x: 0, y: 0, rotation: -12 });
+            gsap.set('.nav-top', { opacity: 0, y: -20 });
+            gsap.set('.grid-line', { scaleY: 0, transformOrigin: 'top' });
 
-        const slideDistance = window.innerHeight * 0.6;
-        gsap.set('.big-text', {
-            yPercent: -50,
-            xPercent: -50,
-            y: -slideDistance * 0.98,
-            x: slideDistance * 0.17,
-            opacity: 0,
-            scale: 1.1,
-            rotation: -3
-        });
+            const slideDistance = window.innerHeight * 0.6;
+            gsap.set('.big-text', {
+                yPercent: -50,
+                xPercent: -50,
+                y: -slideDistance * 0.98,
+                x: slideDistance * 0.17,
+                opacity: 0,
+                scale: 1.1,
+                rotation: -3
+            });
+        } else {
+            // Mobile: Minimal setup - only opacity, no transforms (performance)
+            gsap.set('.pen-hero', { opacity: 0 });
+            gsap.set('.nav-top', { opacity: 0 });
+            gsap.set('.big-text', { opacity: 0, yPercent: -50, xPercent: -50 });
+        }
     }
 
     function playHeroIntro() {
         const tl = gsap.timeline();
 
-        tl.to('.grid-line', { scaleY: 1, duration: 0.8, stagger: 0.05, ease: "power2.out" })
-            .to('.nav-top', { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, "-=0.5")
-            .to('.big-text', {
-                y: 0,
-                x: 0,
-                opacity: 1,
-                scale: 1,
-                rotation: 0,
-                duration: 1.2,
-                ease: "power3.out"
-            }, "-=0.3");
-
         if (!isMobile) {
-            tl.to('.pen-bg-1', {
-                opacity: 0.65,
-                y: 0,
-                x: 0,
-                rotation: -25,
-                duration: 0.8,
-                ease: "power2.out"
-            }, "-=0.7")
+            // Desktop: Full intro animation
+            tl.to('.grid-line', { scaleY: 1, duration: 0.8, stagger: 0.05, ease: "power2.out" })
+                .to('.nav-top', { opacity: 1, y: 0, duration: 0.6, ease: "power2.out" }, "-=0.5")
+                .to('.big-text', {
+                    y: 0,
+                    x: 0,
+                    opacity: 1,
+                    scale: 1,
+                    rotation: 0,
+                    duration: 1.2,
+                    ease: "power3.out"
+                }, "-=0.3")
+                .to('.pen-bg-1', {
+                    opacity: 0.65,
+                    y: 0,
+                    x: 0,
+                    rotation: -25,
+                    duration: 0.8,
+                    ease: "power2.out"
+                }, "-=0.7")
                 .to('.pen-bg-3', {
                     opacity: 0.55,
                     y: 0,
@@ -4251,24 +4269,20 @@
                     rotation: 30,
                     duration: 0.8,
                     ease: "power2.out"
-                }, "-=0.6");
-        }
-
-        tl.to('.pen-hero', {
-            opacity: 1,
-            y: 0,
-            duration: 1,
-            ease: "power2.out"
-        }, "-=0.5");
-
-        if (!isMobile) {
-            tl.to('.pen-fg-1', {
-                opacity: 0.85,
-                y: 0,
-                x: 0,
-                duration: 0.7,
-                ease: "power2.out"
-            }, "-=0.6")
+                }, "-=0.6")
+                .to('.pen-hero', {
+                    opacity: 1,
+                    y: 0,
+                    duration: 1,
+                    ease: "power2.out"
+                }, "-=0.5")
+                .to('.pen-fg-1', {
+                    opacity: 0.85,
+                    y: 0,
+                    x: 0,
+                    duration: 0.7,
+                    ease: "power2.out"
+                }, "-=0.6")
                 .to('.pen-fg-2', {
                     opacity: 0.75,
                     y: 0,
@@ -4276,6 +4290,11 @@
                     duration: 0.7,
                     ease: "power2.out"
                 }, "-=0.5");
+        } else {
+            // Mobile: Ultra-minimal intro - just fade in (no transforms for performance)
+            tl.to('.nav-top', { opacity: 1, duration: 0.4, ease: "power1.out" })
+                .to('.big-text', { opacity: 1, duration: 0.5, ease: "power1.out" }, "-=0.2")
+                .to('.pen-hero', { opacity: 1, duration: 0.5, ease: "power1.out" }, "-=0.3");
         }
 
         tl.eventCallback("onComplete", () => {
@@ -4288,107 +4307,89 @@
     }
 
     function initHeroScroll() {
+        // Mobile: Skip all hero scroll animations for performance
+        if (isMobile) {
+            // Static hero on mobile - just let it scroll naturally with the page
+            return;
+        }
+
+        // Desktop only: Parallax scroll animations
         let heroScrollRotation = -12;
         let heroScrollScale = 1;
         let heroScrollY = 0;
         let heroScrollX = 0;
-
-        const scrubValue = isMobile ? true : 1;
 
         const scrollTl = gsap.timeline({
             scrollTrigger: {
                 trigger: ".hero-wrapper",
                 start: "top top",
                 end: "bottom bottom",
-                scrub: scrubValue,
+                scrub: 1,
                 invalidateOnRefresh: true
             }
         });
 
         // ============================================
-        // PROFESSIONAL PARALLAX DEPTH EFFECT
+        // PROFESSIONAL PARALLAX DEPTH EFFECT (Desktop Only)
         // ============================================
         // Key principle: Distance determines speed, not duration
         // Background (far) = large distance = fast exit
         // Hero (close) = small distance = slow exit, stays visible longest
 
-        if (!isMobile) {
-            // Layer 1: Grid lines - deepest background, exits fastest
-            scrollTl.to(".grid-line", {
-                y: -window.innerHeight * 1.8,  // Fast exit
-                opacity: 0,
-                ease: 'none',
-                force3D: true,
-                duration: 0.3
-            }, 0);
+        // Layer 1: Grid lines - deepest background, exits fastest
+        scrollTl.to(".grid-line", {
+            y: -window.innerHeight * 1.8,  // Fast exit
+            opacity: 0,
+            ease: 'none',
+            force3D: true,
+            duration: 0.3
+        }, 0);
 
-            // Layer 2: Background pens - SLOWED DOWN (was 2.5, now 1.5)
-            // Still faster than fg/text/hero, but less aggressive
-            scrollTl.to(".bg-layer", {
-                y: -window.innerHeight * 1.5,  // Reduced from 2.5 = slower exit
-                rotation: "+=15",
-                ease: "none",
-                force3D: true,
-                duration: 0.5  // Increased from 0.4 = slower
-            }, 0);
+        // Layer 2: Background pens - SLOWED DOWN (was 2.5, now 1.5)
+        // Still faster than fg/text/hero, but less aggressive
+        scrollTl.to(".bg-layer", {
+            y: -window.innerHeight * 1.5,  // Reduced from 2.5 = slower exit
+            rotation: "+=15",
+            ease: "none",
+            force3D: true,
+            duration: 0.5  // Increased from 0.4 = slower
+        }, 0);
 
-            // Layer 3: Text - mid-depth, medium speed
-            scrollTl.to(".big-text", {
-                y: -window.innerHeight * 1.3,  // Medium distance
-                opacity: 0,
-                rotation: -2,
-                ease: 'none',
-                force3D: true,
-                duration: 0.6
-            }, 0);
+        // Layer 3: Text - mid-depth, medium speed
+        scrollTl.to(".big-text", {
+            y: -window.innerHeight * 1.3,  // Medium distance
+            opacity: 0,
+            rotation: -2,
+            ease: 'none',
+            force3D: true,
+            duration: 0.6
+        }, 0);
 
-            // Layer 4: Foreground pens - closer, medium-slow
-            scrollTl.to(".fg-layer", {
-                y: -window.innerHeight * 1.0,  // Less distance = slower
-                rotation: "-=10",
-                ease: "none",
-                force3D: true,
-                duration: 0.8
-            }, 0);
+        // Layer 4: Foreground pens - closer, medium-slow
+        scrollTl.to(".fg-layer", {
+            y: -window.innerHeight * 1.0,  // Less distance = slower
+            rotation: "-=10",
+            ease: "none",
+            force3D: true,
+            duration: 0.8
+        }, 0);
 
-            // Layer 5: HERO PEN - closest, stays visible longest!
-            // Small distance = barely lifts off while others fly away
-            scrollTl.to('.pen-hero', {
-                y: -window.innerHeight * 0.6,  // SMALL distance = slow, gradual exit
-                scale: 0.92,  // Subtle scale reduction
-                rotation: -3,  // Gentle rotation
-                ease: 'none',
-                force3D: true,
-                duration: 1.0,  // Longest proportion = exits last
-                onUpdate: function() {
-                    // Update baseline variables so mouse parallax works with scroll
-                    heroScrollY = gsap.getProperty('.pen-hero', 'y');
-                    heroScrollScale = gsap.getProperty('.pen-hero', 'scale');
-                    heroScrollRotation = gsap.getProperty('.pen-hero', 'rotation');
-                }
-            }, 0);
-
-        } else {
-            // Mobile - SIMPLIFIED for performance (no lag)
-            // Only animate essential visible elements
-
-            // Text - simple fade and move
-            scrollTl.to(".big-text", {
-                y: -window.innerHeight * 0.8,
-                opacity: 0,
-                ease: 'none',
-                force3D: true
-            }, 0);
-
-            // Hero pen - simple move only, no rotation or scale for performance
-            scrollTl.to('.pen-hero', {
-                y: -window.innerHeight * 0.4,
-                ease: 'none',
-                force3D: true
-            }, 0);
-
-            // Skip all background/foreground pen animations on mobile for performance
-        }
+        // Layer 5: HERO PEN - closest, stays visible longest!
+        // Small distance = barely lifts off while others fly away
+        scrollTl.to('.pen-hero', {
+            y: -window.innerHeight * 0.6,  // SMALL distance = slow, gradual exit
+            scale: 0.92,  // Subtle scale reduction
+            rotation: -3,  // Gentle rotation
+            ease: 'none',
+            force3D: true,
+            duration: 1.0,  // Longest proportion = exits last
+            onUpdate: function() {
+                // Update baseline variables so mouse parallax works with scroll
+                heroScrollY = gsap.getProperty('.pen-hero', 'y');
+                heroScrollScale = gsap.getProperty('.pen-hero', 'scale');
+                heroScrollRotation = gsap.getProperty('.pen-hero', 'rotation');
+            }
+        }, 0);
 
         // Mouse parallax - desktop only (preserved from original)
         if (!isMobile) {
@@ -4490,6 +4491,16 @@
     // KINETIC TEXT
     // ============================================
     function initKineticText() {
+        // Skip on mobile for performance - just show text normally
+        if (isMobile) {
+            const textElements = document.querySelectorAll('.kinetic-text');
+            textElements.forEach(el => {
+                gsap.set(el, { opacity: 1 }); // Just make visible
+            });
+            return;
+        }
+
+        // Desktop: Full kinetic text animation
         const textElements = document.querySelectorAll('.kinetic-text');
         textElements.forEach(el => {
             if (el.querySelectorAll('.char').length > 0) return;
