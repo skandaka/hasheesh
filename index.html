@@ -382,13 +382,24 @@
             right: 0;
             width: 100%;
             padding: 10px 40px;
-            padding-top: max(10px, env(safe-area-inset-top));
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 1000;
             pointer-events: none;
             transition: background 0.3s ease, backdrop-filter 0.3s ease;
+            /* iOS Safari fixed positioning bug fixes */
+            transform: translate3d(0, 0, 0);
+            -webkit-transform: translate3d(0, 0, 0);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+        }
+
+        /* Safe area insets with fallback */
+        @supports (padding-top: env(safe-area-inset-top)) {
+            .nav-top {
+                padding-top: max(10px, env(safe-area-inset-top));
+            }
         }
 
         .nav-top.scrolled {
@@ -2655,7 +2666,12 @@
             /* Navigation - Much more spacious */
             .nav-top {
                 padding: 12px 25px;
-                padding-top: max(12px, env(safe-area-inset-top));
+            }
+
+            @supports (padding-top: env(safe-area-inset-top)) {
+                .nav-top {
+                    padding-top: max(12px, env(safe-area-inset-top));
+                }
             }
 
             .logo img {
@@ -3070,7 +3086,12 @@
         @media (max-width: 600px) {
             .nav-top {
                 padding: 18px 20px;
-                padding-top: max(18px, env(safe-area-inset-top));
+            }
+
+            @supports (padding-top: env(safe-area-inset-top)) {
+                .nav-top {
+                    padding-top: max(18px, env(safe-area-inset-top));
+                }
             }
 
             .logo img {
