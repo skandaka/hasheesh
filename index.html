@@ -718,7 +718,7 @@
             overflow-y: hidden;
             -webkit-overflow-scrolling: touch;
             scroll-snap-type: x mandatory;
-            scroll-behavior: smooth;
+            scroll-behavior: auto;
             scrollbar-width: none; /* Firefox */
             -ms-overflow-style: none; /* IE/Edge */
             width: 100%;
@@ -1480,11 +1480,20 @@
                 align-items: stretch;
                 gap: 22px;
                 padding: 0 18px;
-                overflow-x: auto;
+                overflow-x: scroll !important;
                 overflow-y: hidden;
                 -webkit-overflow-scrolling: touch;
-                scroll-snap-type: x mandatory;
+                scroll-snap-type: none !important;
+                scroll-behavior: auto !important;
                 flex: 1;
+                position: relative;
+                min-width: 100%;
+                width: 100%;
+            }
+
+            .product-card {
+                scroll-snap-align: none !important;
+                flex-shrink: 0;
             }
 
             .gallery-intro {
@@ -4396,6 +4405,23 @@
         if (track && !track._scrollInitialized) {
             gsap.set(track, { clearProps: 'transform' });
             track._scrollInitialized = true;
+
+            // Prevent any external code from resetting scroll position
+            let lastScrollLeft = 0;
+            track.addEventListener('scroll', () => {
+                lastScrollLeft = track.scrollLeft;
+            });
+
+            // Prevent scroll position from being reset
+            const observer = new MutationObserver(() => {
+                if (track.scrollLeft !== lastScrollLeft && lastScrollLeft > 0) {
+                    requestAnimationFrame(() => {
+                        track.scrollLeft = lastScrollLeft;
+                    });
+                }
+            });
+
+            observer.observe(track, { attributes: true, childList: false, subtree: false });
         }
 
         // Simple fade-in without ScrollTrigger (no scroll position interference)
