@@ -113,9 +113,6 @@
         }
         // Force scroll to top immediately
         window.scrollTo(0, 0);
-        // Set scroll position to 0 as backup
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
     </script>
 
     <style>
@@ -616,7 +613,6 @@
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            will-change: transform;
         }
 
         .pen-bg-1 {
@@ -852,7 +848,6 @@
             border-radius: 22px;
             overflow: hidden;
             contain: layout paint;
-            will-change: transform;
             box-shadow:
                     0 20px 50px rgba(0, 0, 0, 0.08);
             transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
@@ -878,7 +873,6 @@
             z-index: 0;
             opacity: 0.62;
             /* Keep paint cheap: transforms only */
-            will-change: transform;
             transform: translate3d(-50%, -20%, 0);
             filter: blur(3px);
         }
@@ -928,7 +922,6 @@
             object-fit: contain;
             filter: drop-shadow(0 15px 40px rgba(0, 0, 0, 0.15));
             transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            will-change: transform, filter;
         }
 
         .product-card:hover .product-image {
@@ -3871,22 +3864,11 @@
                     const wasMobile = isMobile;
                     isMobile = currentWidth <= 950;
                     if (wasMobile !== isMobile) {
-                        // Preserve gallery scroll position during refresh
-                        const galleryTrack = document.querySelector('.gallery-track');
-                        const scrollPos = galleryTrack ? galleryTrack.scrollLeft : 0;
-
                         ScrollTrigger.refresh();
-
-                        // Restore gallery scroll position
-                        if (galleryTrack) {
-                            requestAnimationFrame(() => {
-                                galleryTrack.scrollLeft = scrollPos;
-                            });
-                        }
                     }
                     lastWidth = currentWidth;
                 }
-            }, 150);
+            }, 250);
         });
     });
 
@@ -3930,13 +3912,9 @@
             setTimeout(() => {
                 preloader.classList.add('hidden');
                 setTimeout(() => {
-                    // Final scroll reset before removing loading class
-                    window.scrollTo(0, 0);
                     document.body.classList.remove('loading');
                     document.body.classList.add('animating');
                     setTimeout(() => {
-                        // Refresh ScrollTrigger with guaranteed top position
-                        window.scrollTo(0, 0);
                         ScrollTrigger.refresh();
                         initKineticText();
                     }, 100);
@@ -4237,11 +4215,7 @@
                 start: "top top",
                 end: "bottom bottom",
                 scrub: scrubValue,
-                invalidateOnRefresh: true,
-                onRefresh: () => {
-                    // Ensure we're at top when refreshing to prevent animation glitches
-                    window.scrollTo(0, 0);
-                }
+                invalidateOnRefresh: true
             }
         });
 
@@ -4405,23 +4379,6 @@
         if (track && !track._scrollInitialized) {
             gsap.set(track, { clearProps: 'transform' });
             track._scrollInitialized = true;
-
-            // Prevent any external code from resetting scroll position
-            let lastScrollLeft = 0;
-            track.addEventListener('scroll', () => {
-                lastScrollLeft = track.scrollLeft;
-            });
-
-            // Prevent scroll position from being reset
-            const observer = new MutationObserver(() => {
-                if (track.scrollLeft !== lastScrollLeft && lastScrollLeft > 0) {
-                    requestAnimationFrame(() => {
-                        track.scrollLeft = lastScrollLeft;
-                    });
-                }
-            });
-
-            observer.observe(track, { attributes: true, childList: false, subtree: false });
         }
 
         // Simple fade-in without ScrollTrigger (no scroll position interference)
