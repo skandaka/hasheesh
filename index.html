@@ -381,7 +381,7 @@
             top: 0;
             left: 0;
             right: 0;
-            height: max(80px, env(safe-area-inset-top, 0px));
+            height: 20px;
             background: var(--bg-cream);
             z-index: 999;
             pointer-events: none;
@@ -399,14 +399,9 @@
             align-items: center;
             z-index: 1000;
             pointer-events: none;
-            transition: background 0.3s ease, backdrop-filter 0.3s ease;
-            /* iOS Safari fixed positioning bug fixes */
-            transform: translate3d(0, 0, 0);
-            -webkit-transform: translate3d(0, 0, 0);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease, backdrop-filter 0.3s ease;
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
-            /* TEMPORARY TEST - Remove this after confirming deployment works */
-            border-bottom: 5px solid red !important;
         }
 
         /* Safe area insets with fallback */
@@ -422,16 +417,12 @@
         }
 
         /* Hide/Show on scroll behavior */
-        .nav-top {
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease, backdrop-filter 0.3s ease;
-        }
-
         .nav-top.nav-hidden {
-            transform: translate3d(0, -100%, 0);
+            transform: translate3d(0, -100%, 0) !important;
         }
 
         .nav-top.nav-visible {
-            transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0) !important;
         }
 
         .logo {
@@ -845,7 +836,7 @@
         /* Product Cards - Clean & Refined */
         .product-card {
             flex-shrink: 0;
-            width: clamp(460px, 39vw, 590px);
+            width: clamp(460px, 36vw, 550px);
             height: 100%;
             cursor: none;
             transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
@@ -1548,7 +1539,7 @@
             }
 
             .product-card {
-                flex: 0 0 min(85vw, 440px);
+                flex: 0 0 min(78vw, 420px);
                 width: auto;
                 max-width: none;
                 height: auto;
@@ -4083,6 +4074,9 @@
         const hamburger = document.getElementById('hamburgerBtn');
         const navLinks = document.getElementById('navLinks');
 
+        // Set initial nav state as visible
+        nav.classList.add('nav-visible');
+
         if (hamburger) {
             hamburger.addEventListener('click', () => {
                 hamburger.classList.toggle('active');
@@ -4152,38 +4146,37 @@
 
         // Hide on scroll down, show on scroll up
         let lastScroll = 0;
-        let scrollTimeout;
-        const scrollThreshold = 5; // Minimum scroll to trigger hide/show
+        const scrollThreshold = 5;
 
         const handleScroll = () => {
             const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
 
-            // Clear timeout
-            clearTimeout(scrollTimeout);
+            // At top of page - always show
+            if (currentScroll <= 50) {
+                nav.classList.remove('nav-hidden');
+                nav.classList.add('nav-visible');
+            }
+            // Scrolling down - hide
+            else if (currentScroll > lastScroll + scrollThreshold && currentScroll > 100) {
+                nav.classList.add('nav-hidden');
+                nav.classList.remove('nav-visible');
+            }
+            // Scrolling up - show
+            else if (currentScroll < lastScroll - scrollThreshold) {
+                nav.classList.remove('nav-hidden');
+                nav.classList.add('nav-visible');
+            }
 
-            // Debounce for performance
-            scrollTimeout = setTimeout(() => {
-                // At top of page - always show
-                if (currentScroll <= 100) {
-                    nav.classList.remove('nav-hidden');
-                    nav.classList.add('nav-visible');
-                }
-                // Scrolling down - hide
-                else if (currentScroll > lastScroll + scrollThreshold && currentScroll > 100) {
-                    nav.classList.add('nav-hidden');
-                    nav.classList.remove('nav-visible');
-                }
-                // Scrolling up - show
-                else if (currentScroll < lastScroll - scrollThreshold) {
-                    nav.classList.remove('nav-hidden');
-                    nav.classList.add('nav-visible');
-                }
-
-                lastScroll = currentScroll;
-            }, 10);
+            lastScroll = currentScroll <= 0 ? 0 : currentScroll;
         };
 
-        window.addEventListener('scroll', handleScroll, { passive: true });
+        // Add listener for both Lenis (desktop) and native scroll (mobile)
+        if (window.lenis) {
+            window.lenis.on('scroll', handleScroll);
+        } else {
+            window.addEventListener('scroll', handleScroll, { passive: true });
+            document.addEventListener('scroll', handleScroll, { passive: true });
+        }
     }
 
     // ============================================
