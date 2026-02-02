@@ -851,16 +851,25 @@
             overflow-x: auto;
             overflow-y: hidden;
             -webkit-overflow-scrolling: touch;
-            scroll-snap-type: x mandatory;
+            scroll-snap-type: none;
             scroll-behavior: auto;
             scrollbar-width: none; /* Firefox */
             -ms-overflow-style: none; /* IE/Edge */
             width: 100%;
+            overscroll-behavior-x: contain;
         }
 
         /* Hide scrollbar for Chrome/Safari */
         .gallery-track::-webkit-scrollbar {
             display: none;
+        }
+
+        /* End spacer for smooth scroll-back on desktop */
+        .gallery-end-spacer {
+            flex-shrink: 0;
+            width: clamp(60px, 12vw, 150px);
+            height: 1px;
+            pointer-events: none;
         }
 
         /* Mobile: make cards larger and reduce side padding so the card dominates the viewport */
@@ -950,7 +959,6 @@
             overflow: visible;
             display: flex;
             align-items: center;
-            scroll-snap-align: center;
         }
 
         .product-card:hover {
@@ -3523,7 +3531,7 @@
             </h2>
         </div>
 
-        <div class="gallery-track">
+        <div class="gallery-track" data-lenis-prevent>
             <!-- Product Card 1: Blueberry Cookies -->
             <div class="product-card hover-trigger product-card--clickable" data-product="blueberry-cookies">
                 <div class="product-card-inner">
@@ -3621,6 +3629,8 @@
                     </div>
                 </div>
             </div>
+            <!-- End spacer for smooth scroll-back on desktop -->
+            <div class="gallery-end-spacer" aria-hidden="true"></div>
         </div>
     </div>
 </section>
@@ -3888,18 +3898,6 @@
                 </div>
             </div>
 
-            <div class="faq__item">
-                <button class="faq__question hover-trigger">
-                    <span>What is your shipping policy?</span>
-                    <svg class="faq__icon" viewBox="0 0 24 24" width="24" height="24">
-                        <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                        <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </button>
-                <div class="faq__answer">
-                    <p>Free standard shipping on orders over $75. Orders processed within 1-2 business days, arriving within 3-5 business days. Discreet packaging standard.</p>
-                </div>
-            </div>
         </div>
 
     </div>
@@ -4646,27 +4644,33 @@
     // ============================================
     // SCROLL INDICATORS
     // ============================================
+    let galleryIndicatorShown = false; // Track if indicator has been shown once
+
     function initScrollIndicators() {
         const galleryIndicator = document.getElementById('galleryScrollIndicator');
         const galleryTrack = document.querySelector('.gallery-track');
 
 
-        // Gallery scroll indicator - show when gallery enters view, hide when scrolled right
+        // Gallery scroll indicator - show ONLY the first time gallery enters view
         if (galleryIndicator && galleryTrack) {
-            // Show indicator when gallery comes into view
+            // Show indicator when gallery comes into view (first time only)
             ScrollTrigger.create({
                 trigger: '.horizontal-gallery',
                 start: 'top 80%',
-                onEnter: () => galleryIndicator.classList.add('visible'),
-                onLeaveBack: () => galleryIndicator.classList.remove('visible')
+                onEnter: () => {
+                    // Only show the indicator if it hasn't been shown yet
+                    if (!galleryIndicatorShown) {
+                        galleryIndicator.classList.add('visible');
+                    }
+                }
+                // Don't show again when scrolling back up
             });
 
-            // Hide indicator when user scrolls horizontally in the gallery
+            // Hide indicator permanently when user scrolls horizontally in the gallery
             galleryTrack.addEventListener('scroll', () => {
                 if (galleryTrack.scrollLeft > 50) {
                     galleryIndicator.classList.remove('visible');
-                } else {
-                    galleryIndicator.classList.add('visible');
+                    galleryIndicatorShown = true; // Mark as shown, never show again
                 }
             }, { passive: true });
         }
@@ -4687,6 +4691,39 @@
         if (track && !track._scrollInitialized) {
             gsap.set(track, { clearProps: 'transform' });
             track._scrollInitialized = true;
+        }
+
+        // Prevent scroll lock at edges - capture wheel events and handle them properly
+        if (track) {
+            track.addEventListener('wheel', (e) => {
+                // Check if we're at the boundaries
+                const atLeftEdge = track.scrollLeft <= 0;
+                const atRightEdge = track.scrollLeft + track.clientWidth >= track.scrollWidth - 5;
+
+                // If scrolling horizontally (deltaX) or if we're not at an edge, handle normally
+                if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+                    // User is intentionally scrolling horizontally
+                    e.stopPropagation();
+                    return;
+                }
+
+                // Convert vertical scroll to horizontal scroll for the gallery
+                if (e.deltaY !== 0) {
+                    // If at left edge and trying to scroll left (up), allow page scroll
+                    if (atLeftEdge && e.deltaY < 0) {
+                        return; // Allow Lenis to take over for vertical scroll
+                    }
+                    // If at right edge and trying to scroll right (down), allow page scroll
+                    if (atRightEdge && e.deltaY > 0) {
+                        return; // Allow Lenis to take over for vertical scroll
+                    }
+
+                    // Otherwise, convert vertical to horizontal and prevent propagation
+                    e.preventDefault();
+                    e.stopPropagation();
+                    track.scrollLeft += e.deltaY;
+                }
+            }, { passive: false });
         }
 
         // Simple fade-in without ScrollTrigger (no scroll position interference)
