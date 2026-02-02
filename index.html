@@ -759,12 +759,6 @@
             animation: bounceDown 2s ease-in-out infinite;
         }
 
-        .scroll-indicator--hero {
-            bottom: clamp(60px, 12vh, 120px);
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
         .scroll-indicator--gallery {
             position: absolute;
             right: clamp(20px, 4vw, 60px);
@@ -809,10 +803,6 @@
 
         /* Hide gallery scroll indicator on mobile (vertical stack) */
         @media (max-width: 950px) {
-            .scroll-indicator--hero {
-                bottom: auto;
-                top: 75%;
-            }
             .scroll-indicator-arrow {
                 width: 36px;
                 height: 36px;
@@ -3512,12 +3502,6 @@
             <div class="pen-item pen-fg-2 fg-layer"></div>
         </div>
 
-        <!-- Scroll Down Indicator -->
-        <div class="scroll-indicator scroll-indicator--hero" id="heroScrollIndicator">
-            <svg class="scroll-indicator-arrow" viewBox="0 0 24 24">
-                <path d="M12 5v14M5 12l7 7 7-7"/>
-            </svg>
-        </div>
     </div>
 </section>
 
@@ -4504,11 +4488,17 @@
             document.body.classList.remove('animating');
             if (lenis) lenis.start();
 
-            // Show hero scroll indicator after intro completes
-            const heroIndicator = document.getElementById('heroScrollIndicator');
-            if (heroIndicator) {
-                heroIndicator.classList.add('visible');
-            }
+            // Auto-scroll to products section after hero animation completes
+            setTimeout(() => {
+                const productsSection = document.getElementById('collection');
+                if (productsSection) {
+                    gsap.to(window, {
+                        scrollTo: { y: productsSection, offsetY: 0 },
+                        duration: 1.5,
+                        ease: "power2.inOut"
+                    });
+                }
+            }, 500);
         });
 
         initHeroScroll();
@@ -4657,22 +4647,9 @@
     // SCROLL INDICATORS
     // ============================================
     function initScrollIndicators() {
-        const heroIndicator = document.getElementById('heroScrollIndicator');
         const galleryIndicator = document.getElementById('galleryScrollIndicator');
         const galleryTrack = document.querySelector('.gallery-track');
 
-        // Hero scroll indicator - hide when user scrolls past threshold
-        if (heroIndicator) {
-            ScrollTrigger.create({
-                trigger: '.hero-wrapper',
-                start: 'top top',
-                end: '30% top',
-                onLeave: () => heroIndicator.classList.remove('visible'),
-                onEnterBack: () => {
-                    if (heroIntroComplete) heroIndicator.classList.add('visible');
-                }
-            });
-        }
 
         // Gallery scroll indicator - show when gallery enters view, hide when scrolled right
         if (galleryIndicator && galleryTrack) {
