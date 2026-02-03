@@ -857,6 +857,10 @@
             -ms-overflow-style: none; /* IE/Edge */
             width: 100%;
             overscroll-behavior-x: contain;
+            /* GPU acceleration for smooth scrolling */
+            will-change: scroll-position;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
         }
 
         /* Hide scrollbar for Chrome/Safari */
@@ -875,21 +879,23 @@
         /* Mobile: make cards larger and reduce side padding so the card dominates the viewport */
         @media (max-width: 600px) {
             .gallery-container {
-                padding-bottom: 6vh;
+                padding-bottom: 4vh;
             }
 
             .gallery-track {
-                gap: 22px;
-                padding: 0 18px;
+                gap: 18px;
+                padding: 15px 18px;
+                overflow-y: visible;
             }
 
             .product-card {
-                width: min(92vw, 520px);
+                width: min(85vw, 380px);
             }
 
             .product-card-inner {
                 border-radius: 20px;
-                padding: 30px 26px;
+                padding: 28px 22px;
+                overflow: visible;
             }
 
             /* Keep the flavor frame subtle on small screens - add blur and adjust position */
@@ -903,6 +909,15 @@
 
             .product-image {
                 max-width: 120%;
+            }
+
+            .product-image-wrapper {
+                height: 240px;
+                margin-bottom: 18px;
+            }
+
+            .product-image {
+                height: 270px;
             }
         }
 
@@ -959,6 +974,8 @@
             overflow: visible;
             display: flex;
             align-items: center;
+            contain: layout style;
+            will-change: transform;
         }
 
         .product-card:hover {
@@ -1706,33 +1723,35 @@
 
             .gallery-container {
                 height: auto;
-                min-height: 92vh;
+                min-height: auto;
                 width: 100%;
                 display: flex;
                 flex-direction: column;
                 padding: 0;
-                padding-bottom: 8vh;
+                padding-bottom: 4vh;
             }
 
             .gallery-track {
                 flex-direction: row;
-                align-items: stretch;
+                align-items: center;
                 gap: 22px;
-                padding: 0 18px;
+                padding: 20px 18px;
                 overflow-x: scroll !important;
-                overflow-y: hidden;
+                overflow-y: visible;
                 -webkit-overflow-scrolling: touch;
                 scroll-snap-type: none !important;
                 scroll-behavior: auto !important;
-                flex: 1;
+                flex: none;
                 position: relative;
                 min-width: 100%;
                 width: 100%;
+                min-height: fit-content;
             }
 
             .product-card {
                 scroll-snap-align: none !important;
                 flex-shrink: 0;
+                height: auto;
             }
 
             .gallery-intro {
@@ -1759,14 +1778,15 @@
                 max-width: none;
                 height: auto;
                 margin: 0;
-
+                overflow: visible;
             }
 
             .product-card-inner {
-                padding: 45px 33px;
+                padding: 35px 28px;
                 border-radius: 20px;
                 box-shadow:
                         0 15px 40px rgba(0, 0, 0, 0.1);
+                overflow: visible;
             }
 
             .view-details {
@@ -1775,17 +1795,18 @@
             }
 
             .product-image-wrapper {
-                height: 380px;
-                margin-bottom: 24px;
+                height: 280px;
+                margin-bottom: 20px;
+                overflow: visible;
             }
 
             .product-image {
-                height: 420px;
+                height: 310px;
                 max-width: 115%;
             }
 
             .product-card--soon .product-image-wrapper {
-                height: 380px;
+                height: 280px;
                 border-radius: 14px;
                 display: flex;
                 align-items: center;
@@ -3413,8 +3434,8 @@
 
             /* Gallery refinements for extra small mobile */
             .gallery-track {
-                padding: 0 25px;
-                gap: 40px;
+                padding: 15px 20px;
+                gap: 20px;
             }
 
             .gallery-title {
@@ -3422,19 +3443,19 @@
             }
 
             .product-card {
-                max-width: 510px;
+                max-width: 360px;
             }
 
             .product-card-inner {
-                padding: 39px 27px;
+                padding: 30px 22px;
             }
 
             .product-image-wrapper {
-                height: 350px;
+                height: 250px;
             }
 
             .product-image {
-                height: 390px;
+                height: 280px;
                 max-width: 115%;
             }
         }
@@ -4693,37 +4714,78 @@
             track._scrollInitialized = true;
         }
 
-        // Prevent scroll lock at edges - capture wheel events and handle them properly
+        // Optimized horizontal scroll with requestAnimationFrame for buttery smooth scrolling
         if (track) {
+            let targetScrollLeft = track.scrollLeft;
+            let currentScrollLeft = track.scrollLeft;
+            let isScrolling = false;
+            const smoothness = 0.12; // Lower = smoother but slower, higher = snappier
+
+            function smoothScroll() {
+                if (!isScrolling) return;
+
+                currentScrollLeft += (targetScrollLeft - currentScrollLeft) * smoothness;
+                track.scrollLeft = currentScrollLeft;
+
+                // Stop when close enough
+                if (Math.abs(targetScrollLeft - currentScrollLeft) < 0.5) {
+                    track.scrollLeft = targetScrollLeft;
+                    currentScrollLeft = targetScrollLeft;
+                    isScrolling = false;
+                    return;
+                }
+
+                requestAnimationFrame(smoothScroll);
+            }
+
             track.addEventListener('wheel', (e) => {
                 // Check if we're at the boundaries
                 const atLeftEdge = track.scrollLeft <= 0;
                 const atRightEdge = track.scrollLeft + track.clientWidth >= track.scrollWidth - 5;
 
-                // If scrolling horizontally (deltaX) or if we're not at an edge, handle normally
+                // If scrolling horizontally (deltaX), let native handling work
                 if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-                    // User is intentionally scrolling horizontally
                     e.stopPropagation();
                     return;
                 }
 
                 // Convert vertical scroll to horizontal scroll for the gallery
                 if (e.deltaY !== 0) {
-                    // If at left edge and trying to scroll left (up), allow page scroll
+                    // If at left edge and trying to scroll up, allow page scroll
                     if (atLeftEdge && e.deltaY < 0) {
-                        return; // Allow Lenis to take over for vertical scroll
+                        return;
                     }
-                    // If at right edge and trying to scroll right (down), allow page scroll
+                    // If at right edge and trying to scroll down, allow page scroll
                     if (atRightEdge && e.deltaY > 0) {
-                        return; // Allow Lenis to take over for vertical scroll
+                        return;
                     }
 
-                    // Otherwise, convert vertical to horizontal and prevent propagation
+                    // Smooth horizontal scroll with momentum
                     e.preventDefault();
                     e.stopPropagation();
-                    track.scrollLeft += e.deltaY;
+
+                    // Update target position
+                    targetScrollLeft = Math.max(0, Math.min(
+                        track.scrollWidth - track.clientWidth,
+                        targetScrollLeft + e.deltaY * 1.5
+                    ));
+
+                    // Start smooth scrolling if not already
+                    if (!isScrolling) {
+                        isScrolling = true;
+                        currentScrollLeft = track.scrollLeft;
+                        requestAnimationFrame(smoothScroll);
+                    }
                 }
             }, { passive: false });
+
+            // Sync target when user directly scrolls (touch or horizontal wheel)
+            track.addEventListener('scroll', () => {
+                if (!isScrolling) {
+                    targetScrollLeft = track.scrollLeft;
+                    currentScrollLeft = track.scrollLeft;
+                }
+            }, { passive: true });
         }
 
         // Simple fade-in without ScrollTrigger (no scroll position interference)
@@ -4832,57 +4894,59 @@
     // EDUCATION SECTION ANIMATIONS
     // ============================================
     function initEducationAnimations() {
-        gsap.from('.education__eyebrow', {
+        // Set initial hidden states to prevent flash
+        gsap.set('.education__eyebrow', { opacity: 0, y: 20 });
+        gsap.set('.education__title', { opacity: 0, y: 30 });
+        gsap.set('.education__intro', { opacity: 0, y: 20 });
+        gsap.set('.education__spec-card', { opacity: 0, y: 30 });
+
+        gsap.to('.education__eyebrow', {
             scrollTrigger: {
                 trigger: '.education',
                 start: 'top 80%',
-                end: 'bottom 20%',
                 toggleActions: 'play none none none'
             },
-            opacity: 0,
-            y: 20,
+            opacity: 1,
+            y: 0,
             duration: 0.5,
             ease: 'power2.out'
         });
 
-        gsap.from('.education__title', {
+        gsap.to('.education__title', {
             scrollTrigger: {
                 trigger: '.education',
                 start: 'top 75%',
-                end: 'bottom 20%',
                 toggleActions: 'play none none none'
             },
-            opacity: 0,
-            y: 30,
+            opacity: 1,
+            y: 0,
             duration: 0.6,
             ease: 'power3.out',
             delay: 0.1
         });
 
-        gsap.from('.education__intro', {
+        gsap.to('.education__intro', {
             scrollTrigger: {
                 trigger: '.education',
                 start: 'top 70%',
-                end: 'bottom 20%',
                 toggleActions: 'play none none none'
             },
-            opacity: 0,
-            y: 20,
+            opacity: 1,
+            y: 0,
             duration: 0.5,
             ease: 'power2.out',
             delay: 0.2
         });
 
         document.querySelectorAll('.education__spec-card').forEach((card, index) => {
-            gsap.from(card, {
+            gsap.to(card, {
                 scrollTrigger: {
                     trigger: card,
                     start: 'top 85%',
-                    end: 'bottom 20%',
                     toggleActions: 'play none none none'
                 },
-                opacity: 0,
-                y: 30,
+                opacity: 1,
+                y: 0,
                 duration: 0.6,
                 ease: 'power3.out',
                 delay: index * 0.1
@@ -4893,14 +4957,16 @@
             const bar = item.querySelector('.education__blend-fill');
             const targetWidth = bar.style.width;
 
-            gsap.from(bar, {
+            // Set initial state for bar
+            gsap.set(bar, { width: '0%' });
+
+            gsap.to(bar, {
                 scrollTrigger: {
                     trigger: item,
                     start: 'top 90%',
-                    end: 'bottom 20%',
                     toggleActions: 'play none none none'
                 },
-                width: '0%',
+                width: targetWidth,
                 duration: 0.8,
                 ease: 'power2.out',
                 delay: index * 0.08
@@ -4912,12 +4978,15 @@
     // WHY US SECTION ANIMATIONS
     // ============================================
     function initWhyUsAnimations() {
-        const animDefaults = { immediateRender: false, ease: 'power2.out' };
+        // Set initial hidden states immediately to prevent flash
+        gsap.set('.why-us__title', { opacity: 0, y: 40 });
+        gsap.set('.why-us__subtitle', { opacity: 0, y: 20 });
+        gsap.set('.pillar', { opacity: 0, y: 40 });
+        gsap.set('.cta-link', { opacity: 0, y: 20 });
 
         // Mission Title
-        gsap.fromTo('.why-us__title',
-            { opacity: 0, y: 40 },
-            { ...animDefaults, opacity: 1, y: 0, duration: 0.9, ease: 'power3.out',
+        gsap.to('.why-us__title',
+            { opacity: 1, y: 0, duration: 0.9, ease: 'power3.out',
                 scrollTrigger: {
                     trigger: '.why-us__mission',
                     start: 'top 80%',
@@ -4927,9 +4996,8 @@
         );
 
         // Mission Subtitle
-        gsap.fromTo('.why-us__subtitle',
-            { opacity: 0, y: 20 },
-            { ...animDefaults, opacity: 1, y: 0, duration: 0.7, delay: 0.2,
+        gsap.to('.why-us__subtitle',
+            { opacity: 1, y: 0, duration: 0.7, delay: 0.2, ease: 'power2.out',
                 scrollTrigger: {
                     trigger: '.why-us__mission',
                     start: 'top 75%',
@@ -4939,9 +5007,8 @@
         );
 
         // Pillars - Staggered
-        gsap.fromTo('.pillar',
-            { opacity: 0, y: 40 },
-            { ...animDefaults, opacity: 1, y: 0, duration: 0.8, stagger: 0.15, ease: 'power3.out',
+        gsap.to('.pillar',
+            { opacity: 1, y: 0, duration: 0.8, stagger: 0.15, ease: 'power3.out',
                 scrollTrigger: {
                     trigger: '.why-us__pillars',
                     start: 'top 75%',
@@ -4951,9 +5018,8 @@
         );
 
         // CTA Link
-        gsap.fromTo('.cta-link',
-            { opacity: 0, y: 20 },
-            { ...animDefaults, opacity: 1, y: 0, duration: 0.6, delay: 0.3,
+        gsap.to('.cta-link',
+            { opacity: 1, y: 0, duration: 0.6, delay: 0.3, ease: 'power2.out',
                 scrollTrigger: {
                     trigger: '.why-us__cta',
                     start: 'top 85%',
@@ -4967,29 +5033,31 @@
     // FAQ SECTION ANIMATIONS
     // ============================================
     function initFAQAnimations() {
-        gsap.from('.faq__item', {
+        // Set initial hidden states
+        gsap.set('.faq__item', { opacity: 0, x: -50 });
+        gsap.set('.faq__contact', { opacity: 0, y: 30 });
+
+        gsap.to('.faq__item', {
             scrollTrigger: {
                 trigger: '.faq__list',
                 start: 'top 80%',
-                end: 'bottom 20%',
-                toggleActions: 'play reverse play reverse'
+                toggleActions: 'play none none none'
             },
-            opacity: 0,
-            x: -50,
+            opacity: 1,
+            x: 0,
             stagger: 0.1,
             duration: 0.8,
             ease: 'power2.out'
         });
 
-        gsap.from('.faq__contact', {
+        gsap.to('.faq__contact', {
             scrollTrigger: {
                 trigger: '.faq__contact',
                 start: 'top 85%',
-                end: 'bottom 20%',
-                toggleActions: 'play reverse play reverse'
+                toggleActions: 'play none none none'
             },
-            opacity: 0,
-            y: 30,
+            opacity: 1,
+            y: 0,
             duration: 0.8,
             ease: 'power2.out'
         });
@@ -4999,56 +5067,58 @@
     // CONTACT SECTION ANIMATIONS
     // ============================================
     function initContactAnimations() {
-        gsap.from('.contact__eyebrow', {
+        // Set initial hidden states
+        gsap.set('.contact__eyebrow', { opacity: 0, y: 30 });
+        gsap.set('.contact__title', { opacity: 0, y: 50 });
+        gsap.set('.contact__subtitle', { opacity: 0, y: 30 });
+        gsap.set('.contact__form', { opacity: 0, y: 60 });
+
+        gsap.to('.contact__eyebrow', {
             scrollTrigger: {
                 trigger: '.contact',
                 start: 'top 80%',
-                end: 'bottom 20%',
-                toggleActions: 'play reverse play reverse'
+                toggleActions: 'play none none none'
             },
-            opacity: 0,
-            y: 30,
+            opacity: 1,
+            y: 0,
             duration: 0.8,
             ease: 'power2.out'
         });
 
-        gsap.from('.contact__title', {
+        gsap.to('.contact__title', {
             scrollTrigger: {
                 trigger: '.contact',
                 start: 'top 75%',
-                end: 'bottom 20%',
-                toggleActions: 'play reverse play reverse'
+                toggleActions: 'play none none none'
             },
-            opacity: 0,
-            y: 50,
+            opacity: 1,
+            y: 0,
             duration: 1,
             ease: 'power3.out',
             delay: 0.2
         });
 
-        gsap.from('.contact__subtitle', {
+        gsap.to('.contact__subtitle', {
             scrollTrigger: {
                 trigger: '.contact',
                 start: 'top 70%',
-                end: 'bottom 20%',
-                toggleActions: 'play reverse play reverse'
+                toggleActions: 'play none none none'
             },
-            opacity: 0,
-            y: 30,
+            opacity: 1,
+            y: 0,
             duration: 0.8,
             ease: 'power2.out',
             delay: 0.4
         });
 
-        gsap.from('.contact__form', {
+        gsap.to('.contact__form', {
             scrollTrigger: {
                 trigger: '.contact__form',
                 start: 'top 80%',
-                end: 'bottom 20%',
-                toggleActions: 'play reverse play reverse'
+                toggleActions: 'play none none none'
             },
-            opacity: 0,
-            y: 60,
+            opacity: 1,
+            y: 0,
             duration: 1,
             ease: 'power3.out',
             delay: 0.3
