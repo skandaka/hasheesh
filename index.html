@@ -113,6 +113,30 @@
         }
         // Force scroll to top immediately
         window.scrollTo(0, 0);
+
+        // GPU Performance Detection — runs early to apply CSS class before first paint
+        (function() {
+            var dominated = false;
+            try {
+                var c = document.createElement('canvas');
+                var gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+                if (gl) {
+                    var dbg = gl.getExtension('WEBGL_debug_renderer_info');
+                    if (dbg) {
+                        var r = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL).toLowerCase();
+                        // Intel integrated graphics (common in older iMacs)
+                        if (/intel|hd graphics|iris|uhd graphics|swiftshader/.test(r)) dominated = true;
+                        // Older AMD GPUs (pre-Polaris, pre-Vega)
+                        if (/radeon hd|radeon r[5-7]|radeon pro 5[0-3]/.test(r)) dominated = true;
+                    }
+                }
+            } catch(e) {}
+            // Also flag if very few cores (likely older machine)
+            if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) dominated = true;
+            // Respect prefers-reduced-motion
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) dominated = true;
+            if (dominated) document.documentElement.classList.add('perf-reduced');
+        })();
     </script>
 
     <style>
@@ -599,6 +623,63 @@
             50% { transform: translate(-45%, -55%) scale(1.08); }
         }
 
+        /* ============================================
+           REDUCED-PERFORMANCE MODE
+           Targets older GPUs (Intel iGPU, older AMD)
+           ============================================ */
+        .perf-reduced .orb {
+            filter: blur(20px);
+            opacity: 0.06;
+            animation: none !important;
+        }
+
+        .perf-reduced .product-card-inner {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            background: rgba(255, 255, 255, 0.85) !important;
+        }
+
+        .perf-reduced .flavor-frame {
+            filter: none !important;
+        }
+
+        .perf-reduced .pen-bg-1,
+        .perf-reduced .pen-bg-2,
+        .perf-reduced .pen-bg-3 {
+            filter: none !important;
+        }
+
+        .perf-reduced .pen-fg-1,
+        .perf-reduced .pen-fg-2 {
+            filter: none !important;
+        }
+
+        .perf-reduced .pen-hero {
+            filter: drop-shadow(0 15px 25px rgba(0,0,0,0.15)) !important;
+        }
+
+        .perf-reduced .big-text {
+            filter: none !important;
+        }
+
+        .perf-reduced .noise-overlay {
+            display: none !important;
+        }
+
+        .perf-reduced .nav-top {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+
+        .perf-reduced .product-detail-overlay {
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+        }
+
+        .perf-reduced .product-image {
+            filter: drop-shadow(0 8px 20px rgba(0,0,0,0.12)) !important;
+        }
+
         .stage {
             position: absolute;
             top: 0;
@@ -834,7 +915,7 @@
 
         .gallery-container {
             position: relative;
-            height: 100vh;
+            min-height: 100vh;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -846,10 +927,10 @@
             display: flex;
             align-items: center;
             gap: clamp(60px, 7vw, 95px);
-            padding: 0 clamp(60px, 10vw, 140px);
+            padding: clamp(24px, 4vh, 48px) clamp(60px, 10vw, 140px);
             flex: 1;
             overflow-x: auto;
-            overflow-y: hidden;
+            overflow-y: clip;
             -webkit-overflow-scrolling: touch;
             scroll-snap-type: none;
             scroll-behavior: auto;
@@ -968,7 +1049,7 @@
         .product-card {
             flex-shrink: 0;
             width: clamp(460px, 36vw, 550px);
-            height: 100%;
+            height: auto;
             cursor: none;
             transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
             overflow: visible;
@@ -1009,8 +1090,8 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border-radius: 22px;
-            overflow: hidden;
-            contain: layout paint;
+            overflow: clip;
+            contain: layout style;
             box-shadow:
                     0 20px 50px rgba(0, 0, 0, 0.08);
             transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
@@ -4214,9 +4295,10 @@
         const isMobileDevice = window.innerWidth <= 950;
 
         // Only enable smooth scroll on desktop - mobile uses native scroll
+        const perfReduced = document.documentElement.classList.contains('perf-reduced');
         if (!isMobileDevice) {
             lenis = new Lenis({
-                duration: 2.0,
+                duration: perfReduced ? 1.2 : 2.0,
                 easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
                 direction: 'vertical',
                 smooth: true,
@@ -4224,7 +4306,7 @@
                 normalizeWheel: true,
                 syncTouch: false,
                 touchMultiplier: 2,
-                lerp: 0.1,
+                lerp: perfReduced ? 0.15 : 0.1,
             });
 
             window.lenis = lenis; // Make accessible globally
@@ -4243,7 +4325,8 @@
 
         gsap.ticker.lagSmoothing(0);
 
-        if (!isMobileDevice) {
+        // Skip kinetic text skew on low-perf devices (extra repaints)
+        if (!isMobileDevice && !perfReduced) {
             lenis.on('scroll', ({ velocity }) => {
                 const skewAmount = velocity * 0.05;
                 gsap.to('.kinetic-text', {
@@ -4278,6 +4361,13 @@
     // ============================================
     function initCursor() {
         if (window.matchMedia('(hover: none)').matches) return;
+
+        // Hide custom cursor on low-perf devices (saves per-frame GSAP updates)
+        if (document.documentElement.classList.contains('perf-reduced')) {
+            document.body.style.cursor = 'auto';
+            document.querySelectorAll('button, a').forEach(el => el.style.cursor = 'pointer');
+            return;
+        }
 
         const cursor = document.querySelector('.cursor');
 
@@ -4530,8 +4620,10 @@
         let heroScrollY = 0;
         let heroScrollX = 0;
 
+        const perfReduced = document.documentElement.classList.contains('perf-reduced');
+
         // Mobile: lighter scrub for better performance, Desktop: smooth scrub
-        const scrubValue = isMobile ? 2 : 1;
+        const scrubValue = isMobile ? 2 : (perfReduced ? 2 : 1);
 
         const scrollTl = gsap.timeline({
             scrollTrigger: {
@@ -4559,45 +4651,43 @@
             duration: 0.3
         }, 0);
 
-        // Layer 2: Background pens - SLOWED DOWN (was 2.5, now 1.5)
-        // Still faster than fg/text/hero, but less aggressive
+        // Layer 2: Background pens (skip rotation on low-perf to reduce repaints)
         scrollTl.to(".bg-layer", {
-            y: -window.innerHeight * 1.5,  // Reduced from 2.5 = slower exit
-            rotation: "+=15",
+            y: -window.innerHeight * 1.5,
+            rotation: perfReduced ? "+=0" : "+=15",
             ease: "none",
             force3D: true,
-            duration: 0.5  // Increased from 0.4 = slower
+            duration: 0.5
         }, 0);
 
         // Layer 3: Text - mid-depth, medium speed
         scrollTl.to(".big-text", {
             y: -window.innerHeight * 1.3,  // Medium distance
             opacity: 0,
-            rotation: -2,
+            rotation: perfReduced ? 0 : -2,
             ease: 'none',
             force3D: true,
             duration: 0.6
         }, 0);
 
-        // Layer 4: Foreground pens - closer, medium-slow
+        // Layer 4: Foreground pens (skip rotation on low-perf)
         scrollTl.to(".fg-layer", {
-            y: -window.innerHeight * 1.0,  // Less distance = slower
-            rotation: "-=10",
+            y: -window.innerHeight * 1.0,
+            rotation: perfReduced ? "-=0" : "-=10",
             ease: "none",
             force3D: true,
             duration: 0.8
         }, 0);
 
         // Layer 5: HERO PEN - closest, stays visible longest!
-        // Small distance = barely lifts off while others fly away
         scrollTl.to('.pen-hero', {
-            y: -window.innerHeight * 0.6,  // SMALL distance = slow, gradual exit
-            scale: 0.92,  // Subtle scale reduction
-            rotation: -3,  // Gentle rotation
+            y: -window.innerHeight * 0.6,
+            scale: 0.92,
+            rotation: -3,
             ease: 'none',
             force3D: true,
-            duration: 1.0,  // Longest proportion = exits last
-            onUpdate: function() {
+            duration: 1.0,
+            onUpdate: perfReduced ? undefined : function() {
                 // Update baseline variables so mouse parallax works with scroll
                 heroScrollY = gsap.getProperty('.pen-hero', 'y');
                 heroScrollScale = gsap.getProperty('.pen-hero', 'scale');
@@ -4626,8 +4716,9 @@
             }, 0);
         }
 
-        // Mouse parallax - desktop only (preserved from original)
-        if (!isMobile) {
+        // Mouse parallax - desktop only, skip on low-perf devices
+        const isLowPerf = document.documentElement.classList.contains('perf-reduced');
+        if (!isMobile && !isLowPerf) {
             let mouse = { x: 0, y: 0 };
             let target = { x: 0, y: 0 };
 
